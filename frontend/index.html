@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto TODO-dev</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --modal-bg: white;
+            --input-border: #ddd;
+            --header-color: #333;
+            --header-secondary-color: #666;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #f5f5f5;
+            --modal-bg: #2d2d2d;
+            --input-border: #444;
+            --header-color: #fffd75;
+            --header-secondary-color: #ffb6c1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            padding: 20px;
+            min-height: 100vh;
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 1001;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        }
+
+        .theme-toggle:hover {
+            background-color: #45a049;
+        }
+
+        .new-project-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            padding: 10px 15px;
+            background-color: #ffb300;
+            color: #222;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .new-project-btn:hover {
+            background-color: #ffd54f;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--header-color, #333);
+        }
+
+        .header-secondary {
+            text-align: center;
+            color: var(--header-secondary-color, #666);
+            font-size: 2rem;
+            margin-top: 10px;
+        }
+
+        .projects-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .post-it {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            transform: rotate(-2deg);
+        }
+
+        .post-it:hover {
+            transform: rotate(0deg) scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .post-it h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .post-it p {
+            font-size: 0.9rem;
+            flex-grow: 1;
+        }
+
+        .post-it .date {
+            font-size: 0.8rem;
+            text-align: right;
+            font-style: italic;
+        }
+
+        .post-it .actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+            gap: 5px;
+        }
+
+        .post-it:hover .actions {
+            display: flex;
+        }
+
+        .post-it .actions button {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .post-it .actions .edit-btn {
+            color: #2196F3;
+        }
+
+        .post-it .actions .delete-btn {
+            color: #f44336;
+        }
+
+        /* Cores dos post-its */
+        .yellow { background-color: #fffd75; color: #6d4c00; }
+        .pink { background-color: #ffb6c1; color: #6d0037; }
+        .blue { background-color: #add8e6; color: #002d6d; }
+        .green { background-color: #98fb98; color: #006d2a; }
+        .purple { background-color: #e6e6fa; color: #3d006d; }
+        .orange { background-color: #ffdab9; color: #6d2f00; }
+
+        /* Modal (janelinha do formulário) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--modal-bg);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: modalFadeIn 0.3s;
+            color: var(--text-color);
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        form h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        input, textarea, select {
+            padding: 10px;
+            border: 1px solid var(--input-border);
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: var(--modal-bg);
+            color: var(--text-color);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .projects-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar tema">🌙</button>
+    <button class="new-project-btn" onclick="openNewProjectModal(event)">+ New Project</button>
+    <h1>Meus Projetos</h1>
+    
+    <div class="projects-container">
+        <!-- Post-it 1 -->
+        <div class="post-it yellow" onclick="openModal('Projeto Website', 'Desenvolver um website responsivo para cliente X', '2023-10-15')">
+            <a href="tarefas.html" style="text-decoration: none; color: black;">
+            <h3>Projeto Website</h3>
+            <p>Desenvolver um website responsivo para cliente X</p>
+            <div class="date">15/10/2023</div>
+        </a>
+            <div onclick="openModal('Testes Automatizados', 'Implementar suite de testes automatizados', '2023-12-05')">Editar</div>
+        </div>
+        
+        <!-- Post-it 2 -->
+        <div class="post-it pink" onclick="openModal('App Mobile', 'Criar aplicativo de lista de tarefas', '2023-11-02')">
+            <a href="tarefas.html" style="text-decoration: none; color: black;">
+            <h3>App Mobile</h3>
+            <p>Criar aplicativo de lista de tarefas</p>
+            <div class="date">02/11/2023</div>
+        </a>
+            <div onclick="openModal('Testes Automatizados', 'Implementar suite de testes automatizados', '2023-12-05')">Editar</div>
+        </div>
+        
+        <!-- Post-it 3 -->
+        <div class="post-it blue" onclick="openModal('Banco de Dados', 'Migrar banco de dados para nova versão', '2023-11-10')">
+            <a href="tarefas.html" style="text-decoration: none; color: black;">
+            <h3>Banco de Dados</h3>
+            <p>Migrar banco de dados para nova versão</p>
+            <div class="date">10/11/2023</div>
+        </a>
+            <div onclick="openModal('Testes Automatizados', 'Implementar suite de testes automatizados', '2023-12-05')">Editar</div>
+        </a>
+        </div>
+        
+        <!-- Post-it 4 -->
+        <div class="post-it green" onclick="openModal('Redesign UI', 'Atualizar interface do usuário do sistema', '2023-11-18')">
+            <a href="tarefas.html" style="text-decoration: none; color: black;">
+            <h3>Redesign UI</h3>
+            <p>Atualizar interface do usuário do sistema</p>
+            <div class="date">18/11/2023</div>
+        </a>
+            <div onclick="openModal('Testes Automatizados', 'Implementar suite de testes automatizados', '2023-12-05')">Editar</div>
+        </div>
+        
+        <!-- Post-it 5 -->
+        <div class="post-it purple" onclick="openModal('API Integração', 'Desenvolver API para integração com parceiro', '2023-11-25')">
+            <a href="tarefas.html" style="text-decoration: none; color: black;">
+            <h3>API Integração</h3>
+            <p>Desenvolver API para integração com parceiro</p>
+            <div class="date">25/11/2023</div>
+        </a>
+            <div onclick="openModal('Testes Automatizados', 'Implementar suite de testes automatizados', '2023-12-05')">Editar</div>
+        </div>
+        
+        <!-- Post-it 6 -->
+        <div class="post-it orange" >
+            <a href="tarefas.html" style="text-decoration: none; color: black;">
+            <h3>Testes Automatizados</h3>
+            <p>Implementar suite de testes automatizados</p>
+            <div class="date">05/12/2023</div>
+        </a>
+            <div onclick="openModal('Testes Automatizados', 'Implementar suite de testes automatizados', '2023-12-05')">Editar</div>
+        </div>
+    </div>
+    
+    <!-- Modal do Formulário -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <form id="projectForm">
+                <h2 id="modalTitle">Novo Projeto</h2>
+                <input type="text" id="projectName" name="projectName" placeholder="Nome do Projeto" required>
+                <textarea id="projectDescription" name="projectDescription" placeholder="Descrição do projeto" required></textarea>
+                <input type="date" id="projectDate" name="projectDate" required>
+                <select id="projectColor" name="projectColor">
+                    <option value="yellow">Amarelo</option>
+                    <option value="pink">Rosa</option>
+                    <option value="blue">Azul</option>
+                    <option value="green">Verde</option>
+                    <option value="purple">Roxo</option>
+                    <option value="orange">Laranja</option>
+                </select>
+                <button type="submit">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let projects = JSON.parse(localStorage.getItem('projects')) || [];
+        let currentProjectId = null;
+
+        function renderProjects() {
+            const container = document.querySelector('.projects-container');
+            container.innerHTML = '';
+            
+            projects.forEach((project, index) => {
+                const postIt = document.createElement('div');
+                postIt.className = `post-it ${project.color}`;
+                postIt.innerHTML = `
+                    <div class="actions">
+                        <button class="edit-btn">✏️</button>
+                        <button class="delete-btn">🗑️</button>
+                    </div>
+                    <a href="tarefas.html?project=${index}" style="text-decoration: none; color: inherit;">
+                        <h3>${project.name}</h3>
+                        <p>${project.description}</p>
+                        <div class="date">${new Date(project.date).toLocaleDateString('pt-BR')}</div>
+                    </a>
+                `;
+                // Adiciona listeners aos botões
+                const editBtn = postIt.querySelector('.edit-btn');
+                const deleteBtn = postIt.querySelector('.delete-btn');
+                editBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    editProject(index);
+                });
+                deleteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    deleteProject(index);
+                });
+                container.appendChild(postIt);
+            });
+        }
+
+        function openNewProjectModal(e) {
+            e.preventDefault();
+            currentProjectId = null;
+            document.getElementById('modalTitle').textContent = 'Novo Projeto';
+            document.getElementById('projectForm').reset();
+            document.getElementById('projectModal').style.display = 'flex';
+        }
+
+        function editProject(index) {
+            currentProjectId = index;
+            const project = projects[index];
+            document.getElementById('modalTitle').textContent = 'Editar Projeto';
+            document.getElementById('projectName').value = project.name;
+            document.getElementById('projectDescription').value = project.description;
+            document.getElementById('projectDate').value = project.date;
+            document.getElementById('projectColor').value = project.color;
+            document.getElementById('projectModal').style.display = 'flex';
+        }
+
+        function deleteProject(index) {
+            if (confirm('Tem certeza que deseja excluir este projeto?')) {
+                projects.splice(index, 1);
+                saveProjects();
+                renderProjects();
+            }
+        }
+
+        function saveProjects() {
+            localStorage.setItem('projects', JSON.stringify(projects));
+        }
+
+        document.getElementById('projectForm').onsubmit = function(e) {
+            e.preventDefault();
+            
+            const project = {
+                name: document.getElementById('projectName').value,
+                description: document.getElementById('projectDescription').value,
+                date: document.getElementById('projectDate').value,
+                color: document.getElementById('projectColor').value
+            };
+
+            if (currentProjectId !== null) {
+                projects[currentProjectId] = project;
+            } else {
+                projects.push(project);
+            }
+
+            saveProjects();
+            renderProjects();
+            closeModal();
+        };
+
+        function closeModal() {
+            document.getElementById('projectModal').style.display = 'none';
+            currentProjectId = null;
+        }
+
+        // Inicializar a página
+        renderProjects();
+
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.querySelector('.theme-toggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                button.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                button.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Aplicar tema salvo ao carregar a página
+        window.addEventListener('DOMContentLoaded', function() {
+            const theme = localStorage.getItem('theme');
+            const body = document.body;
+            const button = document.querySelector('.theme-toggle');
+            if (theme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                if (button) button.textContent = '☀️';
+            } else {
+                body.removeAttribute('data-theme');
+                if (button) button.textContent = '🌙';
+            }
+        });
+    </script>
+</body>
+</html>
