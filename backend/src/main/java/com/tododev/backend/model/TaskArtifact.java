@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +19,12 @@ public class TaskArtifact {
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
+
+    @Column(nullable = false)
+    private LocalDateTime editedAt;
+
+    @Column(nullable = false)
+    private String type; // e.g., "submission", "comment"
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "task_id")

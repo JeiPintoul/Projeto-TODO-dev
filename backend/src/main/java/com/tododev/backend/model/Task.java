@@ -38,7 +38,7 @@ public class Task {
     private LocalDateTime endDate;
 
     @Column
-    private Long timeSpent; // time spent in minutes
+    private Long timeSpent; // time spent in hours
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "project_id")
