@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Entity
 public class Organizacao {
     
@@ -30,5 +32,5 @@ public class Organizacao {
     private List<Usuario> usuarios = new ArrayList<>();
 
     @OneToMany(mappedBy = "organizacao", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Project> projects = new ArrayList<>();
+    private List<Projeto> projetos = new ArrayList<>();
 }
