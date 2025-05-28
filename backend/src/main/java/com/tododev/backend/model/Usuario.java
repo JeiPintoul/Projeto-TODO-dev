@@ -35,8 +35,7 @@ public class Usuario {
     @Column(nullable = false)
     private String senha;
     
-    @NotBlank(message = "Apelido é obrigatório")
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String apelido;
     
     @ManyToMany

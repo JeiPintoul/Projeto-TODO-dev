@@ -1,5 +1,6 @@
 package com.tododev.backend.service;
 
+import com.tododev.backend.exception.RecursoNaoEncontradoException; // Importe a nova exceção
 import com.tododev.backend.model.*;
 import com.tododev.backend.repository.*;
 
@@ -16,20 +17,17 @@ import java.util.Optional;
 public class ProjetoService {
 
     private final ProjetoRepository projetoRepository;
-
     private final OrganizacaoRepository organizacaoRepository;
-
     private final UsuarioRepository usuarioRepository;
-
     private final UsuarioProjetoRepository usuarioProjetoRepository;
 
     public Projeto criarProjeto(Long organizacaoId, Long managerId, String nome, String descricao) {
 
         Organizacao organizacao = organizacaoRepository.findById(organizacaoId)
-        .orElseThrow(() -> new IllegalArgumentException("Organização não encontrada."));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Organização não encontrada com o ID: " + organizacaoId));
 
         Usuario gerente = usuarioRepository.findById(managerId)
-        .orElseThrow(() -> new IllegalArgumentException("Gerente não encontrado."));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Gerente não encontrado com o ID: " + managerId));
 
         Projeto projeto = new Projeto();
         projeto.setNome(nome);
@@ -41,7 +39,6 @@ public class ProjetoService {
 
         Projeto projetoSalvo = projetoRepository.save(projeto);
 
-        // Certificar que o gerente está associado ao projeto
         UsuarioProjeto usuarioProjeto = new UsuarioProjeto();
         usuarioProjeto.setProjeto(projetoSalvo);
         usuarioProjeto.setUsuario(gerente);
@@ -58,6 +55,4 @@ public class ProjetoService {
     public Optional<Projeto> getProjetoPorId(Long projectId) {
         return projetoRepository.findById(projectId);
     }
-
-    // Additional methods for updating, deleting projects can be added here
 }

@@ -1,5 +1,6 @@
 package com.tododev.backend.service;
 
+import com.tododev.backend.exception.RecursoNaoEncontradoException;
 import com.tododev.backend.model.*;
 import com.tododev.backend.repository.*;
 import org.springframework.stereotype.Service;
@@ -27,9 +28,9 @@ public class TarefaService {
                             List<ArtefatoTarefa> artefatos) {
 
         Projeto projeto = projetoRepository.findById(projetoId)
-            .orElseThrow(() -> new IllegalArgumentException("Projeto não encontrado."));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Projeto não encontrado."));
         Usuario gerente = usuarioRepository.findById(gerenteId)
-            .orElseThrow(() -> new IllegalArgumentException("Gerente não encontrado."));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Gerente não encontrado."));
 
         Tarefa tarefa = Tarefa.builder()
             .gerente(gerente)
@@ -67,12 +68,12 @@ public class TarefaService {
     public Tarefa iniciarTarefa(Long tarefaId, Long usuarioId) {
 
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
-            .orElseThrow(() -> new IllegalArgumentException("Tarefa não encontrada com o ID: " + tarefaId));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Tarefa não encontrada com o ID: " + tarefaId));
 
         Usuario usuario = usuarioRepository.findById(usuarioId)
-            .orElseThrow(() -> new IllegalArgumentException("Usuario não encontrado com o ID: " + usuarioId));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario não encontrado com o ID: " + usuarioId));
 
-        if (tarefa.getStatus() == StatusTarefa.EM_PROGRESSO || tarefa.getStatus() == StatusTarefa.FINALIZADO) {
+        if (tarefa.getStatus() == StatusTarefa.EM_PROGRESSO || tarefa.getStatus() == StatusTarefa.CONCLUIDO) {
             throw new IllegalStateException("Tarefa já está em andamento ou finalizada.");
         }
         tarefa.setStatus(StatusTarefa.EM_PROGRESSO);
@@ -89,12 +90,12 @@ public class TarefaService {
     public Tarefa completarTarefa(Long tarefaId, Long usuarioId) {
 
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
-            .orElseThrow(() -> new IllegalArgumentException("Tarefa não encontrada com o ID: " + tarefaId));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Tarefa não encontrada com o ID: " + tarefaId));
 
         Usuario usuario = usuarioRepository.findById(usuarioId)
-            .orElseThrow(() -> new IllegalArgumentException("Usuario não encontrado com o ID: " + usuarioId));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario não encontrado com o ID: " + usuarioId));
 
-        tarefa.setStatus(StatusTarefa.FINALIZADO);
+        tarefa.setStatus(StatusTarefa.CONCLUIDO);
         tarefa.setUsuarioConcluido(usuario);
         LocalDateTime agora = LocalDateTime.now();
         tarefa.setDataTermino(agora);

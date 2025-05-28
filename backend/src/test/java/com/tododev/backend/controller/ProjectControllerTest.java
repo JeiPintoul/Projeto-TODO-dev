@@ -19,18 +19,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProjetoController.class)
-public class ProjectControllerTest {
+class ProjectControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
+    @SuppressWarnings("removal")
     @MockBean
     private ProjetoService projetoService;
 
     private Projeto projetoAmostra;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         projetoAmostra = new Projeto();
         projetoAmostra.setId(1L);
         projetoAmostra.setNome("Projeto Amostra");
@@ -38,7 +39,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testCriarProjeto() throws Exception {
+    void testCriarProjeto() throws Exception {
         Mockito.when(projetoService.criarProjeto(anyLong(), anyLong(), anyString(), anyString()))
                 .thenReturn(projetoAmostra);
 
@@ -55,7 +56,7 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testGetProjetosPorOrganizacao() throws Exception {
+    void testGetProjetosPorOrganizacao() throws Exception {
         Mockito.when(projetoService.getProjetosPorOrganizacao(anyLong()))
                 .thenReturn(List.of(projetoAmostra));
 
@@ -67,8 +68,8 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testGetProjetoPorIdEncontrado() throws Exception {
-        Mockito.when(projetoService.getProjetoPorId(eq(1L)))
+    void testGetProjetoPorIdEncontrado() throws Exception {
+        Mockito.when(projetoService.getProjetoPorId(1L))
                 .thenReturn(Optional.of(projetoAmostra));
 
         mockMvc.perform(get("/api/projetos/1")
@@ -79,8 +80,8 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void testGetProjectByIdNotFound() throws Exception {
-        Mockito.when(projetoService.getProjetoPorId(eq(2L)))
+    void testGetProjectByIdNotFound() throws Exception {
+        Mockito.when(projetoService.getProjetoPorId(2L))
                 .thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/projetos/2")

@@ -1,8 +1,10 @@
 package com.tododev.backend.controller;
 
+import com.tododev.backend.dto.CriarProjetoDTO;
 import com.tododev.backend.model.Projeto;
 import com.tododev.backend.service.ProjetoService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -16,12 +18,15 @@ public class ProjetoController {
 
     private final ProjetoService projetoService;
 
+    // No ProjetoController.java
     @PostMapping
-    public ResponseEntity<Projeto> criarProjeto(@RequestParam Long organizacaoId,
-                                                 @RequestParam Long gerenteId,
-                                                 @RequestParam String nome,
-                                                 @RequestParam(required = false) String descricao) {
-        Projeto projeto = projetoService.criarProjeto(organizacaoId, gerenteId, nome, descricao);
+    public ResponseEntity<Projeto> criarProjeto(@RequestBody @Valid CriarProjetoDTO projetoDTO) {
+        Projeto projeto = projetoService.criarProjeto(
+            projetoDTO.organizacaoId(), 
+            projetoDTO.gerenteId(), 
+            projetoDTO.nome(), 
+            projetoDTO.descricao()
+        );
         return ResponseEntity.ok(projeto);
     }
 
