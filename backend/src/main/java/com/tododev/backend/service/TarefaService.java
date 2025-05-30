@@ -24,13 +24,15 @@ public class TarefaService {
 
     private final ArtefatoTarefaRepository artefatoTarefaRepository;
 
+    public static final String MSG_TAREFA_NAO_ENCONTRADA = "Tarefa não encontrada com o ID: ";
+
     public Tarefa criarTarefa(Long projetoId, Long gerenteId, String titulo, String descricao, 
                             List<ArtefatoTarefa> artefatos) {
 
         Projeto projeto = projetoRepository.findById(projetoId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException("Projeto não encontrado."));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Projeto não encontrado com o ID: " + projetoId));
         Usuario gerente = usuarioRepository.findById(gerenteId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException("Gerente não encontrado."));
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Gerente não encontrado com o ID: " + gerenteId));
 
         Tarefa tarefa = Tarefa.builder()
             .gerente(gerente)
@@ -68,7 +70,7 @@ public class TarefaService {
     public Tarefa iniciarTarefa(Long tarefaId, Long usuarioId) {
 
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException("Tarefa não encontrada com o ID: " + tarefaId));
+            .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_TAREFA_NAO_ENCONTRADA + tarefaId));
 
         Usuario usuario = usuarioRepository.findById(usuarioId)
             .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario não encontrado com o ID: " + usuarioId));
@@ -90,7 +92,7 @@ public class TarefaService {
     public Tarefa completarTarefa(Long tarefaId, Long usuarioId) {
 
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException("Tarefa não encontrada com o ID: " + tarefaId));
+            .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_TAREFA_NAO_ENCONTRADA + tarefaId));
 
         Usuario usuario = usuarioRepository.findById(usuarioId)
             .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario não encontrado com o ID: " + usuarioId));
@@ -112,6 +114,32 @@ public class TarefaService {
 
     }
 
-    // Additional methods for updating, deleting tasks, adding artifacts, etc.
-    //evolution API, Supabase, Lovable, n8n
+    public Tarefa editarTarefa(Long tarefaId, Long gerenteId, String titulo, String descricao) {
+        Tarefa tarefa = tarefaRepository.findById(tarefaId)
+            .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_TAREFA_NAO_ENCONTRADA + tarefaId));
+        if (!tarefa.getGerente().getId().equals(gerenteId)) {
+            throw new IllegalStateException("Apenas o gerente do projeto pode editar a tarefa.");
+        }
+        tarefa.setTitulo(titulo);
+        tarefa.setDescricao(descricao);
+        return tarefaRepository.save(tarefa);
+    }
+
+    public void deletarTarefa(Long tarefaId, Long gerenteId) {
+        Tarefa tarefa = tarefaRepository.findById(tarefaId)
+            .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_TAREFA_NAO_ENCONTRADA + tarefaId));
+        if (!tarefa.getGerente().getId().equals(gerenteId)) {
+            throw new IllegalStateException("Apenas o gerente do projeto pode deletar a tarefa.");
+        }
+        tarefaRepository.delete(tarefa);
+    }
+
+    public void adicionarArtefatoATarefa(Long tarefaId, ArtefatoTarefa artefato) {
+        Tarefa tarefa = tarefaRepository.findById(tarefaId)
+            .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_TAREFA_NAO_ENCONTRADA + tarefaId));
+        artefato.setTarefa(tarefa);
+        artefato.setEditado(java.time.LocalDateTime.now());
+        artefatoTarefaRepository.save(artefato);
+    }
+
 }

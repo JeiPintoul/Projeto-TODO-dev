@@ -25,6 +25,8 @@ public class ProjetoService {
     private final UsuarioProjetoRepository usuarioProjetoRepository;
     private final ArtefatoProjetoRepository artefatoProjetoRepository;
 
+        public static final String MSG_PROJETO_NAO_ENCONTRADO = "Projeto não encontrada com o ID: ";
+
     public Projeto criarProjeto(Long organizacaoId, Long managerId, String nome, String descricao) {
 
         Organizacao organizacao = organizacaoRepository.findById(organizacaoId)
@@ -62,7 +64,7 @@ public class ProjetoService {
 
     public Projeto atualizarProjeto(Long projetoId, AtualizarProjetoDTO dto) {
         Projeto projeto = projetoRepository.findById(projetoId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException("Projeto não encontrado com o ID: " + projetoId));
+            .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
         projeto.setNome(dto.nome());
         projeto.setDescricao(dto.descricao());
         projeto.setStatus(StatusProjeto.valueOf(dto.status()));
@@ -72,7 +74,7 @@ public class ProjetoService {
 
     public void adicionarMembrosAoProjeto(Long projetoId, List<AdicionarMembroProjetoDTO> membros) {
         Projeto projeto = projetoRepository.findById(projetoId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException("Projeto não encontrado com o ID: " + projetoId));
+            .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
         for (AdicionarMembroProjetoDTO dto : membros) {
             Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com o ID: " + dto.usuarioId()));
@@ -86,7 +88,7 @@ public class ProjetoService {
 
     public void adicionarArtefatoAoProjeto(Long projetoId, AdicionarArtefatoProjetoDTO dto) {
         Projeto projeto = projetoRepository.findById(projetoId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException("Projeto não encontrado com o ID: " + projetoId));
+            .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
         ArtefatoProjeto artefato = new ArtefatoProjeto();
         artefato.setProjeto(projeto);
         artefato.setConteudo(dto.conteudo());
@@ -97,7 +99,7 @@ public class ProjetoService {
 
     public void deletarProjeto(Long projetoId) {
         Projeto projeto = projetoRepository.findById(projetoId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException("Projeto não encontrado com o ID: " + projetoId));
+            .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
         projetoRepository.delete(projeto);
     }
 }

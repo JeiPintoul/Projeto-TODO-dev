@@ -13,16 +13,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/projetos")
+@RequestMapping("/api/{organizacaoId}/projetos")
 public class ProjetoController {
 
     private final ProjetoService projetoService;
 
-    // No ProjetoController.java
     @PostMapping
-    public ResponseEntity<ProjetoResumoDTO> criarProjeto(@RequestBody @Valid CriarProjetoDTO projetoDTO) {
+    public ResponseEntity<ProjetoResumoDTO> criarProjeto(@PathVariable Long organizacaoId, @RequestBody @Valid CriarProjetoDTO projetoDTO) {
         Projeto projeto = projetoService.criarProjeto(
-            projetoDTO.organizacaoId(),
+            organizacaoId,
             projetoDTO.gerenteId(),
             projetoDTO.nome(),
             projetoDTO.descricao()
@@ -30,40 +29,57 @@ public class ProjetoController {
         return ResponseEntity.ok(new ProjetoResumoDTO(projeto.getId(), projeto.getNome()));
     }
 
-    @GetMapping("/organizacao/{organizacaoId}")
-    public ResponseEntity<List<ProjetoResumoDTO>> getProjetosPorOrganizacao(@PathVariable Long organizacaoId) {
+    @GetMapping
+    public ResponseEntity<List<ProjetoResumoDTO>> getProjetos(@PathVariable Long organizacaoId) {
         List<ProjetoResumoDTO> projects = projetoService.getProjetosPorOrganizacao(organizacaoId)
             .stream().map(p -> new ProjetoResumoDTO(p.getId(), p.getNome())).toList();
         return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/{projetoId}")
-    public ResponseEntity<ProjetoResumoDTO> getProjetoPorId(@PathVariable Long projetoId) {
+    public ResponseEntity<ProjetoResumoDTO> getProjetoPorId(@PathVariable Long organizacaoId, @PathVariable Long projetoId) {
+        // Opcional: validar se o projeto pertence à organização
         return projetoService.getProjetoPorId(projetoId)
+                .filter(p -> p.getOrganizacao().getId().equals(organizacaoId))
                 .map(p -> ResponseEntity.ok(new ProjetoResumoDTO(p.getId(), p.getNome())))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{projetoId}")
-    public ResponseEntity<ProjetoResumoDTO> atualizarProjeto(@PathVariable Long projetoId, @RequestBody @Valid AtualizarProjetoDTO dto) {
+    public ResponseEntity<ProjetoResumoDTO> atualizarProjeto(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestBody @Valid AtualizarProjetoDTO dto) {
         Projeto atualizado = projetoService.atualizarProjeto(projetoId, dto);
+        if (!atualizado.getOrganizacao().getId().equals(organizacaoId)) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(new ProjetoResumoDTO(atualizado.getId(), atualizado.getNome()));
     }
 
     @PostMapping("/{projetoId}/membros")
-    public ResponseEntity<Void> adicionarMembros(@PathVariable Long projetoId, @RequestBody @Valid List<AdicionarMembroProjetoDTO> membros) {
+    public ResponseEntity<Void> adicionarMembros(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestBody @Valid List<AdicionarMembroProjetoDTO> membros) {
+        Projeto projeto = projetoService.getProjetoPorId(projetoId).orElse(null);
+        if (projeto == null || !projeto.getOrganizacao().getId().equals(organizacaoId)) {
+            return ResponseEntity.notFound().build();
+        }
         projetoService.adicionarMembrosAoProjeto(projetoId, membros);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{projetoId}/artefatos")
-    public ResponseEntity<Void> adicionarArtefato(@PathVariable Long projetoId, @RequestBody @Valid AdicionarArtefatoProjetoDTO dto) {
+    public ResponseEntity<Void> adicionarArtefato(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestBody @Valid AdicionarArtefatoProjetoDTO dto) {
+        Projeto projeto = projetoService.getProjetoPorId(projetoId).orElse(null);
+        if (projeto == null || !projeto.getOrganizacao().getId().equals(organizacaoId)) {
+            return ResponseEntity.notFound().build();
+        }
         projetoService.adicionarArtefatoAoProjeto(projetoId, dto);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{projetoId}")
-    public ResponseEntity<Void> deletarProjeto(@PathVariable Long projetoId) {
+    public ResponseEntity<Void> deletarProjeto(@PathVariable Long organizacaoId, @PathVariable Long projetoId) {
+        Projeto projeto = projetoService.getProjetoPorId(projetoId).orElse(null);
+        if (projeto == null || !projeto.getOrganizacao().getId().equals(organizacaoId)) {
+            return ResponseEntity.notFound().build();
+        }
         projetoService.deletarProjeto(projetoId);
         return ResponseEntity.ok().build();
     }
