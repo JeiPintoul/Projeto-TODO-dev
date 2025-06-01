@@ -1,0 +1,32 @@
+:root {
+  --bg-color: #f5f5f5;
+  --text-color: #333;
+  --modal-bg: white;
+  --input-border: #ddd;
+  --header-color: #333;
+  --header-secondary-color: #666;
+}
+
+[data-theme="dark"] {
+  --bg-color: #1a1a1a;
+  --text-color: #f5f5f5;
+  --modal-bg: #2d2d2d;
+  --input-border: #444;
+  --header-color: #fffd75;
+  --header-secondary-color: #ffb6c1;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  padding: 20px;
+  min-height: 100vh;
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}
