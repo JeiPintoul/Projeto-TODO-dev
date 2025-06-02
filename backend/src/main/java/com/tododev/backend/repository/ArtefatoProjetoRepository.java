@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ArtefatoProjetoRepository extends JpaRepository<ArtefatoProjeto, Long> {
-    List<ArtefatoProjeto> findByProjectId(Long projectId);
+    List<ArtefatoProjeto> findByProjetoId(Long projetoId);
 }

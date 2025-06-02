@@ -1,5 +1,7 @@
 package com.tododev.backend.service;
 
+import com.tododev.backend.dto.TarefaRespostaDTO;
+import com.tododev.backend.dto.ArtefatoTarefaRespostaDTO;
 import com.tododev.backend.exception.RecursoNaoEncontradoException;
 import com.tododev.backend.model.*;
 import com.tododev.backend.repository.*;
@@ -60,7 +62,7 @@ public class TarefaService {
     }
 
     public List<Tarefa> getTarefasPorProjeto(Long projetoId) {
-        return tarefaRepository.findByProjectId(projetoId);
+        return tarefaRepository.findByProjetoId(projetoId);
     }
 
     public Optional<Tarefa> getTarefaPorId(Long tarefaId) {
@@ -140,6 +142,29 @@ public class TarefaService {
         artefato.setTarefa(tarefa);
         artefato.setEditado(java.time.LocalDateTime.now());
         artefatoTarefaRepository.save(artefato);
+    }
+
+    public List<TarefaRespostaDTO> getTarefasPorUsuario(Long usuarioId) {
+        return tarefaRepository.findAll().stream()
+            .filter(t -> (t.getUsuarioEmAndamento() != null && t.getUsuarioEmAndamento().getId().equals(usuarioId))
+                || (t.getUsuarioConcluido() != null && t.getUsuarioConcluido().getId().equals(usuarioId)))
+            .map(t -> new TarefaRespostaDTO(
+                t.getId(),
+                t.getTitulo(),
+                t.getDescricao(),
+                t.getStatus() != null ? t.getStatus().name() : null,
+                t.getDataCriacao(),
+                t.getDataTermino(),
+                t.getTempoGasto(),
+                t.getProjeto() != null ? t.getProjeto().getId() : null,
+                t.getGerente() != null ? t.getGerente().getId() : null,
+                t.getUsuarioEmAndamento() != null ? t.getUsuarioEmAndamento().getId() : null,
+                t.getUsuarioConcluido() != null ? t.getUsuarioConcluido().getId() : null,
+                t.getArtefatos() != null ? t.getArtefatos().stream().map(a -> new ArtefatoTarefaRespostaDTO(
+                    a.getId(), a.getConteudo(), a.getEditado(), a.getTipo()
+                )).toList() : List.of()
+            ))
+            .toList();
     }
 
 }

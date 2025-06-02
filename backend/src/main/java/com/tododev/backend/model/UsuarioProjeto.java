@@ -25,9 +25,4 @@ public class UsuarioProjeto {
     @ManyToOne(optional = false)
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Funcao funcao;
-
 }

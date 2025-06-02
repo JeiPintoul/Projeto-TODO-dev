@@ -39,8 +39,8 @@ public class Projeto {
     @Column
     private LocalDateTime dataTermino;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "organizacao_id")
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "organizacao_id", nullable = true)
     private Organizacao organizacao;
 
     @ManyToOne(optional = false)

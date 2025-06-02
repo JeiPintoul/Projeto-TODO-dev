@@ -33,4 +33,7 @@ public class Organizacao {
 
     @OneToMany(mappedBy = "organizacao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Projeto> projetos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "organizacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UsuarioOrganizacao> usuariosOrganizacao = new ArrayList<>();
 }

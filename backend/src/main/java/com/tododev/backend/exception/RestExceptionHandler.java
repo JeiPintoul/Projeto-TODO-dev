@@ -38,14 +38,14 @@ public class RestExceptionHandler {
     // Você pode adicionar outros handlers para exceções gerais aqui
     @ExceptionHandler(Exception.class)
     public ResponseEntity<RespostaErro> handleGlobalException(Exception ex, WebRequest request) {
+        ex.printStackTrace(); // Mostra o erro real no console para debug
         RespostaErro errorResponse = new RespostaErro(
                 LocalDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error",
-                "Ocorreu um erro inesperado no servidor.",
+                ex.getMessage(), // Mostra a mensagem real da exceção
                 request.getDescription(false).replace("uri=", "")
         );
-        // Em um ambiente real, você deveria logar a exceção 'ex' aqui.
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

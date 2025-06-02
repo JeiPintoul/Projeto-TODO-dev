@@ -16,7 +16,7 @@ public record RespostaUsuarioDTO(
 
         List<OrganizacaoResumoDTO> orgs = usuario.getOrganizacoes() != null ?
             usuario.getOrganizacoes().stream()
-                .map(org -> new OrganizacaoResumoDTO(org.getId(), org.getNome()))
+                .map(org -> new OrganizacaoResumoDTO(org.getId(), org.getNome(), org.getDescricao()))
                 .toList() : List.of();
         List<ProjetoResumoDTO> projs = usuario.getProjectUsers() != null ?
             usuario.getProjectUsers().stream()
