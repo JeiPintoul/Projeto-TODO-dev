@@ -2,53 +2,31 @@
 import "@styles/TaskPostIt.css";
 
 import TaskData from "@myTypes/tasks";
+import { useRouter } from "next/navigation";
 
-export default function TaskPostIt({ taskInfo }: { taskInfo: TaskData }) {
+export default function TaskPostIt({ taskInfo, setIsOpen, setTaskData }: { taskInfo: TaskData, setIsOpen: (param: boolean) => void, setTaskData: (data: TaskData | null) => void }) {
+  
+  const router = useRouter();
 
   const handleView = (e: React.MouseEvent) => {
-    // TODO: What should happen when clicking task?
+    e.preventDefault();
+    router.push(`/projects/${taskInfo.id}`);
+    // TODO arrumar quando clicar
   };
 
   const handleEdit = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    //editTask(taskInfo);
+    setTaskData(taskInfo);
+    setIsOpen(true);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    deleteProject(taskInfo);
-  };
-
-  // const editTask = (task: TaskData) => {
-  //   const elements = {
-  //     modal: document.getElementById(
-  //       "projectModal editing"
-  //     ) as HTMLElement | null,
-  //     title: document.getElementById("modalTitle editing") as HTMLElement | null,
-  //     name: document.getElementById("projectName editing") as HTMLInputElement | null,
-  //     description: document.getElementById(
-  //       "projectDescription editing"
-  //     ) as HTMLTextAreaElement | null,
-  //     date: document.getElementById("projectDate editing") as HTMLInputElement | null,
-  //     color: document.getElementById(
-  //       "projectColor editing"
-  //     ) as HTMLSelectElement | null,
-  //   };
-
-  //   if (Object.values(elements).some((el) => el === null)) return;
-
-  //   elements.name!.value = project.name;
-  //   elements.description!.value = project.description;
-  //   elements.date!.value = project.date;
-  //   elements.color!.value = project.color;
-  //   elements.modal!.style.display = "flex";
-  // };
-
-  const deleteProject = (taskInfo: TaskData) => {
     if (confirm("Do you really want to exclude this task?")) {
-      //TODO: Delete it from API
+      setIsOpen(false);
+      //TODO delete it from API
       console.log(`Deleting ${taskInfo.id} in API...`);
     }
   };

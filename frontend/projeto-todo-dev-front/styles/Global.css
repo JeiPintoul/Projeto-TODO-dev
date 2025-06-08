@@ -25,7 +25,6 @@
 
 body {
   background-color: var(--bg-color);
-  padding: 20px;
   min-height: 100vh;
   color: var(--text-color);
   transition: background-color 0.3s, color 0.3s;

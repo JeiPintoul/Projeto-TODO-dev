@@ -1,8 +1,12 @@
-import "@styles/Home.css";
-import ProjectData from "@myTypes/projects";
+"use client"
+import "@styles/ProjectsTasks.css";
 import TaskData from "@myTypes/tasks";
-import NewTaskBtn from "@components/NewTaskBtn";
+import ProjectData from "@myTypes/projects";
+import NewTaskBtn from "@components/CreateBtn";
 import TaskPostIt from "@components/TaskPostIt";
+import { useState } from "react";
+import CreatingModalForm from "@components/CreatingTaskModalForm";
+import EditingModalForm from "@components/EditingTaskModalForm";
 
 interface Props {
   params: {
@@ -10,7 +14,7 @@ interface Props {
   };
 }
 
-export default async function ProjectTasksPage({ params }: Props) {
+export default function TasksPage({ params }: Props) {
   // TODO: Fetch project from API
   const project: ProjectData = {
     id: params.id,
@@ -37,27 +41,49 @@ export default async function ProjectTasksPage({ params }: Props) {
       projectId: params.id,
       name: "Task 2",
       description: "Second task",
-      status: "in-progress",
+      status: "progress",
       priority: "high",
       dueDate: "2024-02-15",
       color: "green",
     },
   ];
 
-  return (
-    <>
-      <NewTaskBtn />
 
-      <h1>{project.name}</h1>
-
-      <div className="tasks-container">
-        {tasks.map((task) => (
-          <TaskPostIt key={task.id} taskInfo={task} />
-        ))}
-      </div>
-
-      {/* <CreatingModalForm projectId={params.id} />
-      <EditingModalForm /> */}
-    </>
-  );
-}
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+  
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+    const [taskData, setTaskData] = useState<ProjectData | null>(null);
+  
+    return (
+      <>
+        <NewTaskBtn
+          text="+ New Task"
+          openModal={() => setIsCreateModalOpen(true)}
+        />
+  
+        <h1>{project.name}</h1>
+  
+        <div className="tasks-container">
+          {tasks.map((task) => (
+            <TaskPostIt
+              key={task.id}
+              taskInfo={task}
+              setIsOpen={setIsEditModalOpen}
+              setTaskData={setTaskData}
+            />
+          ))}
+        </div>
+  
+        <CreatingModalForm
+          isOpen={isCreateModalOpen}
+          setIsOpen={setIsCreateModalOpen}
+        />
+        <EditingModalForm
+          isOpen={isEditModalOpen}
+          setIsOpen={setIsEditModalOpen}
+          taskData={taskData}
+        />
+      </>
+    );
+  }
+  

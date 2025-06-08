@@ -1,13 +1,15 @@
-import "@styles/Home.css";
+"use client";
+import "@styles/ProjectsTasks.css";
 
-import CreatingModalForm from "@components/CreatingModalForm";
-import EditingModalForm from "@components/EditingModalForm";
-import NewProjectBtn from "@components/NewProjectBtn";
+import { useState } from "react";
+
 import ProjectPostIt from "@components/ProjectPostIt";
 import ProjectData from "@myTypes/projects";
+import NewProjectBtn from "@components/CreateBtn";
+import CreatingModalForm from "@components/CreatingProjectModalForm";
+import EditingModalForm from "@components/EditingProjectModalForm";
 
 export default function ProjectsPage() {
-
   // TODO: Fetch projects from API
   const projects: ProjectData[] = [
     {
@@ -67,20 +69,40 @@ export default function ProjectsPage() {
     },
   ];
 
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [projectData, setProjectData] = useState<ProjectData | null>(null);
+
   return (
     <>
-      <NewProjectBtn />
+      <NewProjectBtn
+        text="+ New Project"
+        openModal={() => setIsCreateModalOpen(true)}
+      />
 
       <h1>My Projects</h1>
 
       <div className="projects-container">
         {projects.map((project) => (
-          <ProjectPostIt key={project.id} projectInfo={project} />
+          <ProjectPostIt
+            key={project.id}
+            projectInfo={project}
+            setIsOpen={setIsEditModalOpen}
+            setProjectData={setProjectData}
+          />
         ))}
       </div>
-      
-      <CreatingModalForm />
-      <EditingModalForm />
+
+      <CreatingModalForm
+        isOpen={isCreateModalOpen}
+        setIsOpen={setIsCreateModalOpen}
+      />
+      <EditingModalForm
+        isOpen={isEditModalOpen}
+        setIsOpen={setIsEditModalOpen}
+        projectData={projectData}
+      />
     </>
   );
 }

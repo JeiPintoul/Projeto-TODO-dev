@@ -1,13 +1,19 @@
 "use client";
-import "@styles/ModalForm.css";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import ProjectData from "@myTypes/projects";
 import { ProjectColor } from "@myTypes/projects";
+import Modal from "./Modal";
 
-export default function EditingModalForm() {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+type CreatingProjectModalFormProps = {
+  isOpen: boolean;
+  setIsOpen: (param: boolean) => void;
+};
+
+export default function CreatingModalForm({
+  isOpen,
+  setIsOpen,
+}: CreatingProjectModalFormProps) {
   const [formData, setFormData] = useState<ProjectData>({
     id: "",
     name: "",
@@ -15,13 +21,6 @@ export default function EditingModalForm() {
     date: "",
     color: "yellow",
   });
-
-  const closeModal = (): void => {
-    if (modalRef.current) {
-      modalRef.current.style.display = "none";
-    }
-    setCurrentProjectId(null);
-  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -46,25 +45,19 @@ export default function EditingModalForm() {
       color: formData.color as ProjectColor,
     };
 
-    if (modalRef.current) {
-      modalRef.current.style.display = "none";
-    }
-
-      // TODO put json to API
-      console.log("Putting it to API... ", JSON.stringify(projectData, null, 2));
+    setIsOpen(false);
+    // TODO post json to API
+    console.log("Posting it to API... ", JSON.stringify(projectData, null, 2));
   };
 
   return (
-    <div id="projectModal editing" className="modal" ref={modalRef}>
-      <div className="modal-content">
-        <span className="close-btn" onClick={closeModal}>
-          &times;
-        </span>
-        <form id="projectForm editing" onSubmit={handleSubmit}>
-          <h2 id="modalTitle editing">Edit Project</h2>
+    <>
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <form id="projectForm creating" onSubmit={handleSubmit}>
+          <h2 id="modalTitle creating">New Project</h2>
           <input
             type="text"
-            id="projectName editing"
+            id="projectName creating"
             name="name"
             placeholder="Project Name"
             value={formData.name}
@@ -72,7 +65,7 @@ export default function EditingModalForm() {
             required
           />
           <textarea
-            id="projectDescription editing"
+            id="projectDescription creating"
             name="description"
             placeholder="Project Description"
             value={formData.description}
@@ -81,14 +74,14 @@ export default function EditingModalForm() {
           />
           <input
             type="date"
-            id="projectDate editing"
+            id="projectDate creating"
             name="date"
             value={formData.date}
             onChange={handleChange}
             required
           />
           <select
-            id="projectColor editing"
+            id="projectColor creating"
             name="color"
             value={formData.color}
             onChange={handleChange}
@@ -100,9 +93,11 @@ export default function EditingModalForm() {
             <option value="purple">Purple</option>
             <option value="orange">Orange</option>
           </select>
-          <button type="submit" onSubmit={handleSubmit}>Save</button>
+          <button type="submit" onSubmit={handleSubmit}>
+            Save
+          </button>
         </form>
-      </div>
-    </div>
+      </Modal>
+    </>
   );
 }
