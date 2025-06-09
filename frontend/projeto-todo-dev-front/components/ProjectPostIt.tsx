@@ -30,13 +30,15 @@ export default function ProjectPostIt({ projectInfo, setIsOpen, setProjectData }
     }
   };
 
+  if(!setProjectData) return null;
+
   return (
     <div className={`post-it ${projectInfo.color}`} onClick={handleView}>
       <div onClick={handleView} className="post-it-link">
         <h3>{projectInfo.name}</h3>
         <p>{projectInfo.description}</p>
         <div className="date">
-          {new Date(projectInfo.date).toLocaleDateString("en")}
+          {new Date(projectInfo.dueDate).toLocaleDateString("en")}
         </div>
       </div>
       <div className="actions">

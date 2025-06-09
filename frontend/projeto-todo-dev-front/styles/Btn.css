@@ -1,8 +1,4 @@
-.new-task-btn {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1001;
+.Btn {
   padding: 10px 15px;
   background-color: #ffb300;
   color: #222;
@@ -13,6 +9,6 @@
   font-weight: bold;
   transition: background-color 0.2s;
 }
-.new-task-btn:hover {
+.Btn:hover {
   background-color: #ffd54f;
 }

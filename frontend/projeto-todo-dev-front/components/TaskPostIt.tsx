@@ -2,16 +2,13 @@
 import "@styles/TaskPostIt.css";
 
 import TaskData from "@myTypes/tasks";
-import { useRouter } from "next/navigation";
 
-export default function TaskPostIt({ taskInfo, setIsOpen, setTaskData }: { taskInfo: TaskData, setIsOpen: (param: boolean) => void, setTaskData: (data: TaskData | null) => void }) {
-  
-  const router = useRouter();
+export default function TaskPostIt({ taskInfo, setIsOpen, setTaskData, setIsViewOpen }: { taskInfo: TaskData, setIsOpen: (param: boolean) => void, setTaskData: (data: TaskData | null) => void , setIsViewOpen: (param: boolean) => void}) {
 
   const handleView = (e: React.MouseEvent) => {
     e.preventDefault();
-    router.push(`/projects/${taskInfo.id}`);
-    // TODO arrumar quando clicar
+    setTaskData(taskInfo);
+    setIsViewOpen(true);
   };
 
   const handleEdit = (e: React.MouseEvent) => {
@@ -30,6 +27,8 @@ export default function TaskPostIt({ taskInfo, setIsOpen, setTaskData }: { taskI
       console.log(`Deleting ${taskInfo.id} in API...`);
     }
   };
+
+  if (!setTaskData) return null;
 
   return (
     <div className={`post-it ${taskInfo.color}`} onClick={handleView}>
