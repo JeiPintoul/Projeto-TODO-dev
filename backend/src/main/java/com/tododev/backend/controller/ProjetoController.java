@@ -20,17 +20,13 @@ public class ProjetoController {
 
     @PostMapping
     public ResponseEntity<ProjetoResumoDTO> criarProjeto(@PathVariable Long organizacaoId, @RequestBody @Valid CriarProjetoDTO projetoDTO) {
-        try {
-            Projeto projeto = projetoService.criarProjeto(
-                organizacaoId,
-                projetoDTO.gerenteId(),
-                projetoDTO.nome(),
-                projetoDTO.descricao()
-            );
-            return ResponseEntity.ok(new ProjetoResumoDTO(projeto.getId(), projeto.getNome()));
-        } catch (com.tododev.backend.exception.RecursoNaoEncontradoException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Projeto projeto = projetoService.criarProjeto(
+            organizacaoId,
+            projetoDTO.gerenteId(),
+            projetoDTO.nome(),
+            projetoDTO.descricao()
+        );
+        return ResponseEntity.ok(new ProjetoResumoDTO(projeto.getId(), projeto.getNome()));
     }
 
     @GetMapping

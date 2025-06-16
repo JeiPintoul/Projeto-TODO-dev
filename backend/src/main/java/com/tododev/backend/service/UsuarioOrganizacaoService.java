@@ -9,6 +9,9 @@ import com.tododev.backend.model.UsuarioOrganizacao;
 import com.tododev.backend.repository.OrganizacaoRepository;
 import com.tododev.backend.repository.UsuarioOrganizacaoRepository;
 import com.tododev.backend.repository.UsuarioRepository;
+
+import jakarta.transaction.Transactional;
+
 import com.tododev.backend.exception.RecursoNaoEncontradoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class UsuarioOrganizacaoService {
     private final UsuarioOrganizacaoRepository usuarioOrganizacaoRepository;
     private final UsuarioRepository usuarioRepository;

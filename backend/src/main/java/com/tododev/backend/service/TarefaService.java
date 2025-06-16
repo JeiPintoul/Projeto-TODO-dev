@@ -5,6 +5,9 @@ import com.tododev.backend.dto.ArtefatoTarefaRespostaDTO;
 import com.tododev.backend.exception.RecursoNaoEncontradoException;
 import com.tododev.backend.model.*;
 import com.tododev.backend.repository.*;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class TarefaService {
 
     private final TarefaRepository tarefaRepository;

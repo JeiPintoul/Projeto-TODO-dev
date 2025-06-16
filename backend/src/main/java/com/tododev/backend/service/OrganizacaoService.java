@@ -2,6 +2,9 @@ package com.tododev.backend.service;
 
 import com.tododev.backend.model.Organizacao;
 import com.tododev.backend.repository.OrganizacaoRepository;
+
+import jakarta.transaction.Transactional;
+
 import com.tododev.backend.exception.RecursoNaoEncontradoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,6 +12,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class OrganizacaoService {
     private final OrganizacaoRepository organizacaoRepository;
 

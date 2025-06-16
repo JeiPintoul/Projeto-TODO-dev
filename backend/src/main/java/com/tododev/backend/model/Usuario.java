@@ -37,14 +37,6 @@ public class Usuario {
     
     @Column(unique = true)
     private String apelido;
-    
-    @ManyToMany
-    @JoinTable(
-        name = "usuario_organizacao",
-        joinColumns = @JoinColumn(name = "usuario_id"),
-        inverseJoinColumns = @JoinColumn(name = "organizacao_id")
-    )
-    private List<Organizacao> organizacoes = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UsuarioProjeto> projectUsers = new ArrayList<>();

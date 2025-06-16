@@ -3,6 +3,9 @@ package com.tododev.backend.service;
 import com.tododev.backend.exception.RecursoNaoEncontradoException; // Importe a nova exceção
 import com.tododev.backend.model.*;
 import com.tododev.backend.repository.*;
+
+import jakarta.transaction.Transactional;
+
 import com.tododev.backend.dto.AtualizarProjetoDTO;
 import com.tododev.backend.dto.AdicionarMembroProjetoDTO;
 import com.tododev.backend.dto.AdicionarArtefatoProjetoDTO;
@@ -18,6 +21,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class ProjetoService {
 
     private final ProjetoRepository projetoRepository;

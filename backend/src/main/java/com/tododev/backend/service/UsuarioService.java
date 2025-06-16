@@ -2,6 +2,9 @@ package com.tododev.backend.service;
 
 import com.tododev.backend.model.Usuario;
 import com.tododev.backend.repository.UsuarioRepository;
+
+import jakarta.transaction.Transactional;
+
 import com.tododev.backend.exception.RecursoNaoEncontradoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,14 +14,15 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
 
     public Usuario criarUsuario(String nome, String email, String senha, String apelido) {
-        if (usuarioRepository.findAll().stream().anyMatch(u -> u.getEmail().equalsIgnoreCase(email))) {
+        if (usuarioRepository.existsByEmailIgnoreCase(email)) {
             throw new IllegalArgumentException("Já existe um usuário com este e-mail.");
         }
-        if (apelido != null && !apelido.isBlank() && usuarioRepository.findAll().stream().anyMatch(u -> apelido.equalsIgnoreCase(u.getApelido()))) {
+        if (apelido != null && !apelido.isBlank() && usuarioRepository.existsByApelidoIgnoreCase(apelido)) {
             throw new IllegalArgumentException("Já existe um usuário com este apelido.");
         }
         Usuario usuario = new Usuario();
