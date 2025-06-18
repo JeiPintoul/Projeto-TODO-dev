@@ -9,6 +9,9 @@ export default interface TaskData {
     description: string;
     status: TaskStatus;
     priority: TaskPriority;
-    dueDate: string;
     color: TaskColor;
+    startDate: string;
+    dueDate: string;
+
+    artefacts: string;
   }
