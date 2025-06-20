@@ -38,8 +38,8 @@ export default function LoginForm() {
       password: formData.password,
     };
 
-    // TODO: Put json to API
-    console.log("Putting it to API... ", JSON.stringify(loginData, null, 2));
+    // TODO: Add json to API
+    console.log("Add it to API... ", JSON.stringify(loginData, null, 2));
   };
 
   return (

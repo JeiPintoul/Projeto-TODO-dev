@@ -1,4 +1,4 @@
-export default interface RegisterData {
+export default interface UserData {
     name: string;
     cpf: string;
     phone: string;

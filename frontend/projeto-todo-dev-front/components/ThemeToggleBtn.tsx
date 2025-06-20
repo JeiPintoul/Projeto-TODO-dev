@@ -1,5 +1,5 @@
 "use client";
-import "@styles/ThemeToggleBtn.css"
+import "@styles/ThemeToggleBtn.css";
 
 import { useEffect, useState } from "react";
 

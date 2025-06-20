@@ -4,7 +4,8 @@ import "@styles/ProjectPostIt.css";
 import ProjectData from "@myTypes/projects";
 import { useRouter } from "next/navigation";
 
-export default function ProjectPostIt({ projectInfo }: { projectInfo: ProjectData }) {
+export default function ProjectPostIt({ projectInfo, setIsOpen, setProjectData }: { projectInfo: ProjectData, setIsOpen: (param: boolean) => void, setProjectData: (data: ProjectData | null) => void }) {
+  
   const router = useRouter();
 
   const handleView = (e: React.MouseEvent) => {
@@ -15,46 +16,21 @@ export default function ProjectPostIt({ projectInfo }: { projectInfo: ProjectDat
   const handleEdit = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    editProject(projectInfo);
+    setProjectData(projectInfo);
+    setIsOpen(true);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    deleteProject(projectInfo);
-  };
-
-  const editProject = (project: ProjectData) => {
-    const elements = {
-      modal: document.getElementById(
-        "projectModal editing"
-      ) as HTMLElement | null,
-      title: document.getElementById("modalTitle editing") as HTMLElement | null,
-      name: document.getElementById("projectName editing") as HTMLInputElement | null,
-      description: document.getElementById(
-        "projectDescription editing"
-      ) as HTMLTextAreaElement | null,
-      date: document.getElementById("projectDate editing") as HTMLInputElement | null,
-      color: document.getElementById(
-        "projectColor editing"
-      ) as HTMLSelectElement | null,
-    };
-
-    if (Object.values(elements).some((el) => el === null)) return;
-
-    elements.name!.value = project.name;
-    elements.description!.value = project.description;
-    elements.date!.value = project.date;
-    elements.color!.value = project.color;
-    elements.modal!.style.display = "flex";
-  };
-
-  const deleteProject = (projectInfo: ProjectData) => {
     if (confirm("Do you really want to exclude this project?")) {
+      setIsOpen(false);
       //TODO delete it from API
       console.log(`Deleting ${projectInfo.id} in API...`);
     }
   };
+
+  if(!setProjectData) return null;
 
   return (
     <div className={`post-it ${projectInfo.color}`} onClick={handleView}>
@@ -62,7 +38,7 @@ export default function ProjectPostIt({ projectInfo }: { projectInfo: ProjectDat
         <h3>{projectInfo.name}</h3>
         <p>{projectInfo.description}</p>
         <div className="date">
-          {new Date(projectInfo.date).toLocaleDateString("en")}
+          {new Date(projectInfo.dueDate).toLocaleDateString("en")}
         </div>
       </div>
       <div className="actions">

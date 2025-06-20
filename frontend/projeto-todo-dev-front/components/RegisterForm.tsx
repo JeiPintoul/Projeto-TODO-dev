@@ -1,10 +1,10 @@
 "use client";
 import "@styles/LoginRegisterForm.css";
 import { useState } from "react";
-import RegisterData from "@myTypes/register";
+import UserData from "@myTypes/user";
 
 export default function RegisterForm() {
-  const [formData, setFormData] = useState<RegisterData>({
+  const [formData, setFormData] = useState<UserData>({
     name: "",
     cpf: "",
     phone: "",
@@ -25,7 +25,7 @@ export default function RegisterForm() {
   const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
 
-    const registerData: RegisterData = {
+    const UserData: UserData = {
       name: formData.name,
       cpf: formData.cpf,
       phone: formData.phone,
@@ -33,7 +33,7 @@ export default function RegisterForm() {
       password: formData.password,
     };
 
-    console.log("Putting it to API... ", JSON.stringify(registerData, null, 2));
+    console.log("Putting it to API... ", JSON.stringify(UserData, null, 2));
   };
 
   return (
