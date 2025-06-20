@@ -19,10 +19,11 @@ public class ProjetoController {
     private final ProjetoService projetoService;
 
     @PostMapping
-    public ResponseEntity<ProjetoResumoDTO> criarProjeto(@PathVariable Long organizacaoId, @RequestBody @Valid CriarProjetoDTO projetoDTO) {
+    public ResponseEntity<ProjetoResumoDTO> criarProjeto(@PathVariable Long organizacaoId, @RequestParam Long usuarioId, @RequestBody @Valid CriarProjetoDTO projetoDTO) {
+        // Regra: só usuário autenticado pode criar projeto
         Projeto projeto = projetoService.criarProjeto(
             organizacaoId,
-            projetoDTO.gerenteId(),
+            usuarioId,
             projetoDTO.nome(),
             projetoDTO.descricao()
         );
@@ -30,24 +31,26 @@ public class ProjetoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProjetoResumoDTO>> getProjetos(@PathVariable Long organizacaoId) {
-        List<ProjetoResumoDTO> projects = projetoService.getProjetosPorOrganizacao(organizacaoId)
+    public ResponseEntity<List<ProjetoResumoDTO>> getProjetos(@PathVariable Long organizacaoId, @RequestParam Long usuarioId) {
+        // Regra: só membros da organização podem listar projetos
+        List<ProjetoResumoDTO> projects = projetoService.getProjetosPorOrganizacao(organizacaoId, usuarioId)
             .stream().map(p -> new ProjetoResumoDTO(p.getId(), p.getNome())).toList();
         return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/{projetoId}")
-    public ResponseEntity<ProjetoResumoDTO> getProjetoPorId(@PathVariable Long organizacaoId, @PathVariable Long projetoId) {
-        // Opcional: validar se o projeto pertence à organização
-        return projetoService.getProjetoPorId(projetoId)
+    public ResponseEntity<ProjetoResumoDTO> getProjetoPorId(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestParam Long usuarioId) {
+        // Regra: só membros do projeto podem visualizar
+        return projetoService.getProjetoPorId(projetoId, usuarioId)
                 .filter(p -> p.getOrganizacao().getId().equals(organizacaoId))
                 .map(p -> ResponseEntity.ok(new ProjetoResumoDTO(p.getId(), p.getNome())))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{projetoId}")
-    public ResponseEntity<ProjetoResumoDTO> atualizarProjeto(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestBody @Valid AtualizarProjetoDTO dto) {
-        Projeto atualizado = projetoService.atualizarProjeto(projetoId, dto);
+    public ResponseEntity<ProjetoResumoDTO> atualizarProjeto(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestParam Long usuarioId, @RequestBody @Valid AtualizarProjetoDTO dto) {
+        // Regra: só gerente pode atualizar
+        Projeto atualizado = projetoService.atualizarProjeto(projetoId, usuarioId, dto);
         if (!atualizado.getOrganizacao().getId().equals(organizacaoId)) {
             return ResponseEntity.notFound().build();
         }
@@ -55,32 +58,23 @@ public class ProjetoController {
     }
 
     @PostMapping("/{projetoId}/membros")
-    public ResponseEntity<Void> adicionarMembros(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestBody @Valid List<AdicionarMembroProjetoDTO> membros) {
-        Projeto projeto = projetoService.getProjetoPorId(projetoId).orElse(null);
-        if (projeto == null || !projeto.getOrganizacao().getId().equals(organizacaoId)) {
-            return ResponseEntity.notFound().build();
-        }
-        projetoService.adicionarMembrosAoProjeto(projetoId, membros);
+    public ResponseEntity<Void> adicionarMembros(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestParam Long usuarioId, @RequestBody @Valid List<AdicionarMembroProjetoDTO> membros) {
+        // Regra: só gerente pode adicionar membros
+        projetoService.adicionarMembrosAoProjeto(projetoId, usuarioId, membros);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{projetoId}/artefatos")
-    public ResponseEntity<Void> adicionarArtefato(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestBody @Valid AdicionarArtefatoProjetoDTO dto) {
-        Projeto projeto = projetoService.getProjetoPorId(projetoId).orElse(null);
-        if (projeto == null || !projeto.getOrganizacao().getId().equals(organizacaoId)) {
-            return ResponseEntity.notFound().build();
-        }
-        projetoService.adicionarArtefatoAoProjeto(projetoId, dto);
+    public ResponseEntity<Void> adicionarArtefato(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestParam Long usuarioId, @RequestBody @Valid AdicionarArtefatoProjetoDTO dto) {
+        // Regra: só membros do projeto podem adicionar artefatos
+        projetoService.adicionarArtefatoAoProjeto(projetoId, usuarioId, dto);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{projetoId}")
-    public ResponseEntity<Void> deletarProjeto(@PathVariable Long organizacaoId, @PathVariable Long projetoId) {
-        Projeto projeto = projetoService.getProjetoPorId(projetoId).orElse(null);
-        if (projeto == null || !projeto.getOrganizacao().getId().equals(organizacaoId)) {
-            return ResponseEntity.notFound().build();
-        }
-        projetoService.deletarProjeto(projetoId);
+    public ResponseEntity<Void> deletarProjeto(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestParam Long usuarioId) {
+        // Regra: só gerente pode deletar
+        projetoService.deletarProjeto(projetoId, usuarioId);
         return ResponseEntity.ok().build();
     }
     

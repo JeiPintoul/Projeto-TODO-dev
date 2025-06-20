@@ -57,17 +57,33 @@ public class ProjetoService {
         return projetoSalvo;
     }
 
-    public List<Projeto> getProjetosPorOrganizacao(Long organizacaoId) {
+    public List<Projeto> getProjetosPorOrganizacao(Long organizacaoId, Long usuarioId) {
+        // Regra: só membros da organização podem listar projetos
+        UsuarioOrganizacao usuarioOrg = usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(usuarioId, organizacaoId);
+        if (usuarioOrg == null) {
+            throw new IllegalStateException("Usuário não faz parte da organização.");
+        }
         return projetoRepository.findByOrganizacaoId(organizacaoId);
     }
 
-    public Optional<Projeto> getProjetoPorId(Long projectId) {
-        return projetoRepository.findById(projectId);
-    }
-
-    public Projeto atualizarProjeto(Long projetoId, AtualizarProjetoDTO dto) {
+    public Optional<Projeto> getProjetoPorId(Long projetoId, Long usuarioId) {
         Projeto projeto = projetoRepository.findById(projetoId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
+        if (projeto.getOrganizacao() != null) {
+            UsuarioOrganizacao usuarioOrg = usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(usuarioId, projeto.getOrganizacao().getId());
+            if (usuarioOrg == null) {
+                return Optional.empty();
+            }
+        }
+        return Optional.of(projeto);
+    }
+
+    public Projeto atualizarProjeto(Long projetoId, Long usuarioId, AtualizarProjetoDTO dto) {
+        Projeto projeto = projetoRepository.findById(projetoId)
+            .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
+        if (!projeto.getGerente().getId().equals(usuarioId)) {
+            throw new IllegalStateException("Apenas o gerente pode atualizar o projeto.");
+        }
         projeto.setNome(dto.nome());
         projeto.setDescricao(dto.descricao());
         projeto.setStatus(StatusProjeto.valueOf(dto.status()));
@@ -75,9 +91,12 @@ public class ProjetoService {
         return projetoRepository.save(projeto);
     }
 
-    public void adicionarMembrosAoProjeto(Long projetoId, List<AdicionarMembroProjetoDTO> membros) {
+    public void adicionarMembrosAoProjeto(Long projetoId, Long usuarioId, List<AdicionarMembroProjetoDTO> membros) {
         Projeto projeto = projetoRepository.findById(projetoId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
+        if (!projeto.getGerente().getId().equals(usuarioId)) {
+            throw new IllegalStateException("Apenas o gerente pode adicionar membros.");
+        }
         for (AdicionarMembroProjetoDTO dto : membros) {
             Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com o ID: " + dto.usuarioId()));
@@ -92,9 +111,13 @@ public class ProjetoService {
         }
     }
 
-    public void adicionarArtefatoAoProjeto(Long projetoId, AdicionarArtefatoProjetoDTO dto) {
+    public void adicionarArtefatoAoProjeto(Long projetoId, Long usuarioId, AdicionarArtefatoProjetoDTO dto) {
         Projeto projeto = projetoRepository.findById(projetoId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
+        boolean isMembro = projeto.getUsuariosProjeto().stream().anyMatch(up -> up.getUsuario().getId().equals(usuarioId));
+        if (!isMembro) {
+            throw new IllegalStateException("Apenas membros do projeto podem adicionar artefatos.");
+        }
         ArtefatoProjeto artefato = new ArtefatoProjeto();
         artefato.setProjeto(projeto);
         artefato.setConteudo(dto.conteudo());
@@ -103,9 +126,12 @@ public class ProjetoService {
         artefatoProjetoRepository.save(artefato);
     }
 
-    public void deletarProjeto(Long projetoId) {
+    public void deletarProjeto(Long projetoId, Long usuarioId) {
         Projeto projeto = projetoRepository.findById(projetoId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
+        if (!projeto.getGerente().getId().equals(usuarioId)) {
+            throw new IllegalStateException("Apenas o gerente pode deletar o projeto.");
+        }
         projetoRepository.delete(projeto);
     }
 

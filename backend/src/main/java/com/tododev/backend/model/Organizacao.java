@@ -28,9 +28,6 @@ public class Organizacao {
     @Column
     private String descricao;
 
-    @ManyToMany(mappedBy = "organizacoes")
-    private List<Usuario> usuarios = new ArrayList<>();
-
     @OneToMany(mappedBy = "organizacao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Projeto> projetos = new ArrayList<>();
 

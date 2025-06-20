@@ -28,38 +28,44 @@ public class OrganizacaoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrganizacaoResumoDTO>> listarOrganizacoes() {
-        List<OrganizacaoResumoDTO> orgs = organizacaoService.listarOrganizacoes().stream()
-            .map(o -> new OrganizacaoResumoDTO(o.getId(), o.getNome(), o.getDescricao()))
+    public ResponseEntity<List<OrganizacaoResumoDTO>> listarOrganizacoes(@RequestParam Long usuarioId) {
+        // Regra: usuário autenticado pode listar organizações que participa
+        List<OrganizacaoResumoDTO> orgs = organizacaoService.listarOrganizacoes(usuarioId).stream()
+            .map(org -> new OrganizacaoResumoDTO(org.getId(), org.getNome(), org.getDescricao()))
             .toList();
         return ResponseEntity.ok(orgs);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrganizacaoResumoDTO> getOrganizacaoPorId(@PathVariable Long id) {
-        Organizacao org = organizacaoService.getOrganizacaoPorId(id);
+    public ResponseEntity<OrganizacaoResumoDTO> getOrganizacaoPorId(@PathVariable Long id, @RequestParam Long usuarioId) {
+        // Regra: só membros podem ver detalhes
+        Organizacao org = organizacaoService.getOrganizacaoPorId(id, usuarioId);
         return ResponseEntity.ok(new OrganizacaoResumoDTO(org.getId(), org.getNome(), org.getDescricao()));
     }
 
     @GetMapping("/{organizacaoId}/usuarios")
-    public ResponseEntity<List<UsuarioOrganizacaoRespostaDTO>> listarUsuariosOrganizacao(@PathVariable Long organizacaoId) {
-        return ResponseEntity.ok(usuarioOrganizacaoService.listarUsuariosPorOrganizacao(organizacaoId));
+    public ResponseEntity<List<UsuarioOrganizacaoRespostaDTO>> listarUsuariosOrganizacao(@PathVariable Long organizacaoId, @RequestParam Long usuarioId) {
+        // Regra: só membros podem listar usuários
+        return ResponseEntity.ok(usuarioOrganizacaoService.listarUsuariosPorOrganizacao(organizacaoId, usuarioId));
     }
 
     @PostMapping("/{organizacaoId}/usuarios")
-    public ResponseEntity<UsuarioOrganizacaoRespostaDTO> adicionarUsuarioOrganizacao(@PathVariable Long organizacaoId, @RequestBody @Valid AdicionarUsuarioOrganizacaoDTO dto) {
-        return ResponseEntity.ok(usuarioOrganizacaoService.adicionarUsuario(organizacaoId, dto));
+    public ResponseEntity<UsuarioOrganizacaoRespostaDTO> adicionarUsuarioOrganizacao(@PathVariable Long organizacaoId, @RequestParam Long usuarioId, @RequestBody @Valid AdicionarUsuarioOrganizacaoDTO dto) {
+        // Regra: só gerente pode adicionar usuário
+        return ResponseEntity.ok(usuarioOrganizacaoService.adicionarUsuario(organizacaoId, usuarioId, dto));
     }
 
     @PutMapping("/{organizacaoId}/usuarios/{usuarioId}/funcao")
-    public ResponseEntity<Void> alterarFuncaoUsuario(@PathVariable Long organizacaoId, @PathVariable Long usuarioId, @RequestParam Funcao funcao) {
-        usuarioOrganizacaoService.alterarFuncaoUsuario(organizacaoId, usuarioId, funcao);
+    public ResponseEntity<Void> alterarFuncaoUsuario(@PathVariable Long organizacaoId, @PathVariable Long usuarioId, @RequestParam Funcao funcao, @RequestParam Long usuarioIdLogado) {
+        // Regra: só gerente pode alterar função
+        usuarioOrganizacaoService.alterarFuncaoUsuario(organizacaoId, usuarioId, funcao, usuarioIdLogado);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{organizacaoId}/usuarios/{usuarioId}")
-    public ResponseEntity<Void> removerUsuarioOrganizacao(@PathVariable Long organizacaoId, @PathVariable Long usuarioId) {
-        usuarioOrganizacaoService.removerUsuario(organizacaoId, usuarioId);
+    public ResponseEntity<Void> removerUsuarioOrganizacao(@PathVariable Long organizacaoId, @PathVariable Long usuarioId, @RequestParam Long usuarioIdLogado) {
+        // Regra: só gerente pode remover usuário
+        usuarioOrganizacaoService.removerUsuario(organizacaoId, usuarioId, usuarioIdLogado);
         return ResponseEntity.noContent().build();
     }
 }

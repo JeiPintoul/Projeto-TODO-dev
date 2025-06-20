@@ -26,12 +26,20 @@ public class OrganizacaoService {
         return organizacaoRepository.save(org);
     }
 
-    public List<Organizacao> listarOrganizacoes() {
-        return organizacaoRepository.findAll();
+    public List<Organizacao> listarOrganizacoes(Long usuarioId) {
+        // Retorna apenas organizações que o usuário participa
+        return organizacaoRepository.findAll().stream()
+            .filter(org -> org.getUsuariosOrganizacao().stream().anyMatch(uo -> uo.getUsuario().getId().equals(usuarioId)))
+            .toList();
     }
 
-    public Organizacao getOrganizacaoPorId(Long id) {
-        return organizacaoRepository.findById(id).orElseThrow(() -> 
+    public Organizacao getOrganizacaoPorId(Long id, Long usuarioId) {
+        Organizacao org = organizacaoRepository.findById(id).orElseThrow(() -> 
             new RecursoNaoEncontradoException("Organização não encontrada com o ID: " + id));
+        boolean isMembro = org.getUsuariosOrganizacao().stream().anyMatch(uo -> uo.getUsuario().getId().equals(usuarioId));
+        if (!isMembro) {
+            throw new IllegalStateException("Usuário não faz parte da organização.");
+        }
+        return org;
     }
 }

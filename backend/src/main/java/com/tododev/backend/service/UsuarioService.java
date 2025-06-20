@@ -54,4 +54,22 @@ public class UsuarioService {
                 || (u.getApelido() != null && u.getApelido().toLowerCase().contains(termoLower)))
             .toList();
     }
+
+    public Usuario atualizarUsuario(Long id, String nome, String email, String senha, String apelido) {
+        Usuario usuario = getUsuarioPorId(id);
+        if (nome != null) usuario.setNome(nome);
+        if (email != null) usuario.setEmail(email);
+        if (senha != null) usuario.setSenha(senha);
+        if (apelido != null) usuario.setApelido(apelido);
+        try {
+            return usuarioRepository.save(usuario);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalArgumentException("Erro ao atualizar usuário: dados duplicados ou inválidos.");
+        }
+    }
+
+    public void deletarUsuario(Long id) {
+        Usuario usuario = getUsuarioPorId(id);
+        usuarioRepository.delete(usuario);
+    }
 }

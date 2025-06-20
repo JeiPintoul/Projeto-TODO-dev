@@ -16,7 +16,6 @@ import com.tododev.backend.exception.RecursoNaoEncontradoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -50,7 +49,43 @@ public class UsuarioOrganizacaoService {
                 uo.getUsuario().getEmail(),
                 uo.getUsuario().getApelido(),
                 uo.getFuncao()
-            )).collect(Collectors.toList());
+            )).toList();
+    }
+
+    public List<UsuarioOrganizacaoRespostaDTO> listarUsuariosPorOrganizacao(Long organizacaoId, Long usuarioId) {
+        // Só membros podem listar
+        UsuarioOrganizacao membro = usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(usuarioId, organizacaoId);
+        if (membro == null) {
+            throw new IllegalStateException("Usuário não faz parte da organização.");
+        }
+        return listarUsuariosPorOrganizacao(organizacaoId);
+    }
+
+    public UsuarioOrganizacaoRespostaDTO adicionarUsuario(Long organizacaoId, Long usuarioId, AdicionarUsuarioOrganizacaoDTO dto) {
+        // Só gerente pode adicionar
+        UsuarioOrganizacao gerente = usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(usuarioId, organizacaoId);
+        if (gerente == null || gerente.getFuncao() != Funcao.GERENTE) {
+            throw new IllegalStateException("Apenas gerente pode adicionar usuário.");
+        }
+        return adicionarUsuario(organizacaoId, dto);
+    }
+
+    public void alterarFuncaoUsuario(Long organizacaoId, Long usuarioId, Funcao novaFuncao, Long usuarioIdLogado) {
+        // Só gerente pode alterar função
+        UsuarioOrganizacao gerente = usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(usuarioIdLogado, organizacaoId);
+        if (gerente == null || gerente.getFuncao() != Funcao.GERENTE) {
+            throw new IllegalStateException("Apenas gerente pode alterar função.");
+        }
+        alterarFuncaoUsuario(organizacaoId, usuarioId, novaFuncao);
+    }
+
+    public void removerUsuario(Long organizacaoId, Long usuarioId, Long usuarioIdLogado) {
+        // Só gerente pode remover
+        UsuarioOrganizacao gerente = usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(usuarioIdLogado, organizacaoId);
+        if (gerente == null || gerente.getFuncao() != Funcao.GERENTE) {
+            throw new IllegalStateException("Apenas gerente pode remover usuário.");
+        }
+        removerUsuario(organizacaoId, usuarioId);
     }
 
     public void alterarFuncaoUsuario(Long organizacaoId, Long usuarioId, Funcao novaFuncao) {
