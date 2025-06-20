@@ -1,0 +1,68 @@
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  .modal-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  .full-width {
+    width: 100%;
+  }
+  
+  .half-width {
+    width: 50%;
+  }
+  
+  .form-input,
+  .form-textarea,
+  .form-select,
+  .form-button {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .form-textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  .form-select.multiple {
+    height: auto;
+    min-height: 120px;
+  }
+  
+  .form-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 1rem;
+  }
+  
+  .form-button:hover {
+    background-color: #45a049;
+  }
+
+  .p-info {
+    color: #8d8989;
+    font-size: 1rem;
+  }

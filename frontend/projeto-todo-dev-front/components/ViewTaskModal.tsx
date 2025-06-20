@@ -30,6 +30,15 @@ export default function ViewTaskModal({
       </div>
 
       <div className="data">
+        <h3>Start Date</h3>   
+        <p>{new Date(taskData.startData).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })}</p>            
+      </div>
+
+      <div className="data">
         <h3>Due Date</h3>   
         <p>{new Date(taskData.dueDate).toLocaleDateString('en-US', {
           year: 'numeric',
@@ -51,6 +60,11 @@ export default function ViewTaskModal({
           {taskData.status === 'progress' ? 'In Progress' : 
            taskData.status.charAt(0).toUpperCase() + taskData.status.slice(1)}
         </p>            
+      </div>
+
+      <div className="data">
+        <h3>Artefacts</h3>   
+        <p>{taskData.artefacts}</p>       
       </div>
     </Modal>
   );

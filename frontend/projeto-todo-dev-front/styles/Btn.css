@@ -8,6 +8,7 @@
   font-size: 1rem;
   font-weight: bold;
   transition: background-color 0.2s;
+  margin-right: 10px;
 }
 .Btn:hover {
   background-color: #ffd54f;
