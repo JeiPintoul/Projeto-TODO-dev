@@ -33,17 +33,33 @@ class UsuarioServiceTest {
         usuario.setEmail("email@teste.com");
         usuario.setSenha("senha123");
         usuario.setApelido("apelido");
+        usuario.setCpf("12345678901");
+        usuario.setTelefone("11999999999");
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
-        Usuario salvo = usuarioService.criarUsuario("Nome", "email@teste.com", "senha123", "apelido");
+        Usuario salvo = usuarioService.criarUsuario("Nome", "email@teste.com", "senha123", "apelido", "12345678901", "11999999999");
         assertEquals("Nome", salvo.getNome());
         assertEquals("email@teste.com", salvo.getEmail());
+        assertEquals("12345678901", salvo.getCpf());
+        assertEquals("11999999999", salvo.getTelefone());
     }
 
     @Test
     void criarUsuario_emailDuplicado() {
         when(usuarioRepository.existsByEmailIgnoreCase("email@teste.com")).thenReturn(true);
         assertThrows(IllegalArgumentException.class, () ->
-            usuarioService.criarUsuario("Nome", "email@teste.com", "senha123", "apelido")
+            usuarioService.criarUsuario("Nome", "email@teste.com", "senha123", "apelido", "12345678901", "11999999999")
+        );
+    }
+
+    @Test
+    void criarUsuario_cpfDuplicado() {
+        when(usuarioRepository.existsByEmailIgnoreCase("email2@teste.com")).thenReturn(false);
+        when(usuarioRepository.existsByApelidoIgnoreCase("apelido2")).thenReturn(false);
+        Usuario usuarioExistente = new Usuario();
+        usuarioExistente.setCpf("12345678901");
+        when(usuarioRepository.findAll()).thenReturn(java.util.List.of(usuarioExistente));
+        assertThrows(IllegalArgumentException.class, () ->
+            usuarioService.criarUsuario("Nome", "email2@teste.com", "senha123", "apelido2", "12345678901", "11999999999")
         );
     }
 

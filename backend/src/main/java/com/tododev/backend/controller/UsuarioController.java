@@ -27,7 +27,14 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<RespostaUsuarioDTO> criarUsuario(@RequestBody @Valid UsuarioDTO dto) {
-        Usuario usuario = usuarioService.criarUsuario(dto.nome(), dto.email(), dto.senha(), dto.apelido());
+        Usuario usuario = usuarioService.criarUsuario(
+            dto.nome(),
+            dto.email(),
+            dto.senha(),
+            dto.apelido(),
+            dto.cpf(),
+            dto.telefone()
+        );
         return ResponseEntity.ok(RespostaUsuarioDTO.daEntidade(usuario));
     }
 

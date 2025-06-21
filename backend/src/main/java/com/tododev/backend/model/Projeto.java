@@ -29,30 +29,35 @@ public class Projeto {
     @Column
     private String descricao;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private StatusProjeto status;
+    @Column
+    private String cor;
+
+    @Column
+    private String artefatos;
+
+    @Column
+    private String status;
 
     @Column(nullable = false)
     private LocalDateTime dataCriacao;
 
     @Column
-    private LocalDateTime dataTermino;
+    private LocalDateTime dataInicio;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "organizacao_id", nullable = true)
-    private Organizacao organizacao;
+    @Column
+    private LocalDateTime dataVencimento;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "gerente_id")
-    private Usuario gerente;
+    @ManyToMany
+    @JoinTable(
+        name = "projeto_organizacao",
+        joinColumns = @JoinColumn(name = "projeto_id"),
+        inverseJoinColumns = @JoinColumn(name = "organizacao_id")
+    )
+    private List<Organizacao> organizacoes = new ArrayList<>();
 
     @OneToMany(mappedBy = "projeto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarefa> tarefas = new ArrayList<>();
 
     @OneToMany(mappedBy = "projeto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UsuarioProjeto> usuariosProjeto = new ArrayList<>();
-
-    @OneToMany(mappedBy = "projeto", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ArtefatoProjeto> artefatos = new ArrayList<>();
 }

@@ -10,6 +10,7 @@ import com.tododev.backend.dto.AtualizarProjetoDTO;
 import com.tododev.backend.dto.AdicionarMembroProjetoDTO;
 import com.tododev.backend.dto.AdicionarArtefatoProjetoDTO;
 import com.tododev.backend.dto.ProjetoResumoDTO;
+import com.tododev.backend.dto.CriarProjetoDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,27 +34,48 @@ public class ProjetoService {
 
         public static final String MSG_PROJETO_NAO_ENCONTRADO = "Projeto não encontrada com o ID: ";
 
-    public Projeto criarProjeto(Long organizacaoId, Long managerId, String nome, String descricao) {
-        Organizacao organizacao = organizacaoRepository.findById(organizacaoId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException("Organização não encontrada com o ID: " + organizacaoId));
-        Usuario gerente = usuarioRepository.findById(managerId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException("Gerente não encontrado com o ID: " + managerId));
-        UsuarioOrganizacao usuarioOrg = usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(gerente.getId(), organizacao.getId());
-        if (usuarioOrg == null || usuarioOrg.getFuncao() != Funcao.GERENTE) {
-            throw new IllegalStateException("O usuário informado não é gerente da organização.");
+    public Projeto criarProjeto(CriarProjetoDTO dto, Long usuarioId) {
+        // Validação: o usuário que está criando deve estar na lista de managers
+        if (dto.managerIds() == null || !dto.managerIds().contains(usuarioId)) {
+            throw new IllegalStateException("Usuário não está na lista de gerentes do projeto.");
         }
         Projeto projeto = new Projeto();
-        projeto.setNome(nome);
-        projeto.setDescricao(descricao);
-        projeto.setOrganizacao(organizacao);
-        projeto.setGerente(gerente);
-        projeto.setStatus(StatusProjeto.PENDENTE);
+        projeto.setNome(dto.nome());
+        projeto.setDescricao(dto.descricao());
+        projeto.setCor(dto.cor());
+        projeto.setStatus(dto.status());
+        projeto.setArtefatos(dto.artefatos());
         projeto.setDataCriacao(LocalDateTime.now());
+        // Conversão de datas
+        if (dto.dataInicio() != null && !dto.dataInicio().isBlank()) {
+            projeto.setDataInicio(LocalDateTime.parse(dto.dataInicio()));
+        }
+        if (dto.dataVencimento() != null && !dto.dataVencimento().isBlank()) {
+            projeto.setDataVencimento(LocalDateTime.parse(dto.dataVencimento()));
+        }
+        // Associações com organizações
+        List<Organizacao> organizacoes = organizacaoRepository.findAllById(dto.companyIds());
+        projeto.setOrganizacoes(organizacoes);
         Projeto projetoSalvo = projetoRepository.save(projeto);
-        UsuarioProjeto usuarioProjeto = new UsuarioProjeto();
-        usuarioProjeto.setProjeto(projetoSalvo);
-        usuarioProjeto.setUsuario(gerente);
-        usuarioProjetoRepository.save(usuarioProjeto);
+        // Associações com usuários (gerentes e trabalhadores)
+        for (Long managerId : dto.managerIds()) {
+            Usuario gerente = usuarioRepository.findById(managerId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Gerente não encontrado com o ID: " + managerId));
+            UsuarioProjeto usuarioProjeto = new UsuarioProjeto();
+            usuarioProjeto.setProjeto(projetoSalvo);
+            usuarioProjeto.setUsuario(gerente);
+            usuarioProjetoRepository.save(usuarioProjeto);
+        }
+        for (Long workerId : dto.workerIds()) {
+            if (!dto.managerIds().contains(workerId)) {
+                Usuario trabalhador = usuarioRepository.findById(workerId)
+                    .orElseThrow(() -> new RecursoNaoEncontradoException("Trabalhador não encontrado com o ID: " + workerId));
+                UsuarioProjeto usuarioProjeto = new UsuarioProjeto();
+                usuarioProjeto.setProjeto(projetoSalvo);
+                usuarioProjeto.setUsuario(trabalhador);
+                usuarioProjetoRepository.save(usuarioProjeto);
+            }
+        }
         return projetoSalvo;
     }
 
@@ -69,9 +91,12 @@ public class ProjetoService {
     public Optional<Projeto> getProjetoPorId(Long projetoId, Long usuarioId) {
         Projeto projeto = projetoRepository.findById(projetoId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
-        if (projeto.getOrganizacao() != null) {
-            UsuarioOrganizacao usuarioOrg = usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(usuarioId, projeto.getOrganizacao().getId());
-            if (usuarioOrg == null) {
+        // Se o projeto estiver associado a organizações, o usuário deve ser membro de pelo menos uma delas
+        if (!projeto.getOrganizacoes().isEmpty()) {
+            boolean membro = projeto.getOrganizacoes().stream().anyMatch(org ->
+                usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(usuarioId, org.getId()) != null
+            );
+            if (!membro) {
                 return Optional.empty();
             }
         }
@@ -81,29 +106,60 @@ public class ProjetoService {
     public Projeto atualizarProjeto(Long projetoId, Long usuarioId, AtualizarProjetoDTO dto) {
         Projeto projeto = projetoRepository.findById(projetoId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
-        if (!projeto.getGerente().getId().equals(usuarioId)) {
-            throw new IllegalStateException("Apenas o gerente pode atualizar o projeto.");
+        // Só gerentes podem atualizar
+        boolean isGerente = projeto.getUsuariosProjeto().stream()
+            .anyMatch(up -> up.getUsuario().getId().equals(usuarioId) && dto.managerIds().contains(usuarioId));
+        if (!isGerente) {
+            throw new IllegalStateException("Apenas um gerente pode atualizar o projeto.");
         }
         projeto.setNome(dto.nome());
         projeto.setDescricao(dto.descricao());
-        projeto.setStatus(StatusProjeto.valueOf(dto.status()));
-        projeto.setDataTermino(dto.dataTermino());
+        projeto.setCor(dto.cor());
+        projeto.setStatus(dto.status());
+        projeto.setArtefatos(dto.artefatos());
+        if (dto.dataInicio() != null && !dto.dataInicio().isBlank()) {
+            projeto.setDataInicio(LocalDateTime.parse(dto.dataInicio()));
+        }
+        if (dto.dataVencimento() != null && !dto.dataVencimento().isBlank()) {
+            projeto.setDataVencimento(LocalDateTime.parse(dto.dataVencimento()));
+        }
+        // Atualiza organizações
+        List<Organizacao> novasOrgs = organizacaoRepository.findAllById(dto.companyIds());
+        projeto.setOrganizacoes(novasOrgs);
+        // Atualiza membros (remove todos e adiciona novamente)
+        usuarioProjetoRepository.deleteAll(projeto.getUsuariosProjeto());
+        for (Long managerId : dto.managerIds()) {
+            Usuario gerente = usuarioRepository.findById(managerId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Gerente não encontrado com o ID: " + managerId));
+            UsuarioProjeto usuarioProjeto = new UsuarioProjeto();
+            usuarioProjeto.setProjeto(projeto);
+            usuarioProjeto.setUsuario(gerente);
+            usuarioProjetoRepository.save(usuarioProjeto);
+        }
+        for (Long workerId : dto.workerIds()) {
+            if (!dto.managerIds().contains(workerId)) {
+                Usuario trabalhador = usuarioRepository.findById(workerId)
+                    .orElseThrow(() -> new RecursoNaoEncontradoException("Trabalhador não encontrado com o ID: " + workerId));
+                UsuarioProjeto usuarioProjeto = new UsuarioProjeto();
+                usuarioProjeto.setProjeto(projeto);
+                usuarioProjeto.setUsuario(trabalhador);
+                usuarioProjetoRepository.save(usuarioProjeto);
+            }
+        }
         return projetoRepository.save(projeto);
     }
 
     public void adicionarMembrosAoProjeto(Long projetoId, Long usuarioId, List<AdicionarMembroProjetoDTO> membros) {
         Projeto projeto = projetoRepository.findById(projetoId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
-        if (!projeto.getGerente().getId().equals(usuarioId)) {
-            throw new IllegalStateException("Apenas o gerente pode adicionar membros.");
+        boolean isGerente = projeto.getUsuariosProjeto().stream()
+            .anyMatch(up -> up.getUsuario().getId().equals(usuarioId));
+        if (!isGerente) {
+            throw new IllegalStateException("Apenas gerente pode adicionar membros.");
         }
         for (AdicionarMembroProjetoDTO dto : membros) {
             Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com o ID: " + dto.usuarioId()));
-            UsuarioOrganizacao usuarioOrg = usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(usuario.getId(), projeto.getOrganizacao().getId());
-            if (usuarioOrg == null) {
-                throw new IllegalStateException("Usuário não faz parte da organização do projeto.");
-            }
             UsuarioProjeto usuarioProjeto = new UsuarioProjeto();
             usuarioProjeto.setProjeto(projeto);
             usuarioProjeto.setUsuario(usuario);
@@ -129,8 +185,10 @@ public class ProjetoService {
     public void deletarProjeto(Long projetoId, Long usuarioId) {
         Projeto projeto = projetoRepository.findById(projetoId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
-        if (!projeto.getGerente().getId().equals(usuarioId)) {
-            throw new IllegalStateException("Apenas o gerente pode deletar o projeto.");
+        boolean isGerente = projeto.getUsuariosProjeto().stream()
+            .anyMatch(up -> up.getUsuario().getId().equals(usuarioId));
+        if (!isGerente) {
+            throw new IllegalStateException("Apenas gerente pode deletar o projeto.");
         }
         projetoRepository.delete(projeto);
     }
@@ -148,10 +206,10 @@ public class ProjetoService {
         Projeto projeto = new Projeto();
         projeto.setNome(nome);
         projeto.setDescricao(descricao);
-        projeto.setOrganizacao(null);
-        projeto.setGerente(usuario);
-        projeto.setStatus(StatusProjeto.PENDENTE);
+        projeto.setCor(null);
+        projeto.setStatus("PESSOAL");
         projeto.setDataCriacao(LocalDateTime.now());
+        projeto.setOrganizacoes(new java.util.ArrayList<>());
         Projeto projetoSalvo = projetoRepository.save(projeto);
         UsuarioProjeto usuarioProjeto = new UsuarioProjeto();
         usuarioProjeto.setProjeto(projetoSalvo);
@@ -162,7 +220,7 @@ public class ProjetoService {
 
     public List<ProjetoResumoDTO> listarProjetosPessoais(Long usuarioId) {
         return projetoRepository.findAll().stream()
-            .filter(p -> p.getOrganizacao() == null && p.getGerente() != null && p.getGerente().getId().equals(usuarioId))
+            .filter(p -> p.getOrganizacoes().isEmpty() && p.getUsuariosProjeto().stream().anyMatch(up -> up.getUsuario().getId().equals(usuarioId)))
             .map(p -> new ProjetoResumoDTO(p.getId(), p.getNome()))
             .toList();
     }

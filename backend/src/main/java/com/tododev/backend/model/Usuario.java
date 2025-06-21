@@ -38,6 +38,12 @@ public class Usuario {
     @Column(unique = true)
     private String apelido;
 
+    @Column(unique = true, nullable = false, length = 14)
+    private String cpf;
+
+    @Column(length = 20)
+    private String telefone;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UsuarioProjeto> projectUsers = new ArrayList<>();
 

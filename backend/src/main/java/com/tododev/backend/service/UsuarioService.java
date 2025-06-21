@@ -23,18 +23,23 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioOrganizacaoRepository usuarioOrganizacaoRepository;
 
-    public Usuario criarUsuario(String nome, String email, String senha, String apelido) {
+    public Usuario criarUsuario(String nome, String email, String senha, String apelido, String cpf, String telefone) {
         if (usuarioRepository.existsByEmailIgnoreCase(email)) {
             throw new IllegalArgumentException("Já existe um usuário com este e-mail.");
         }
         if (apelido != null && !apelido.isBlank() && usuarioRepository.existsByApelidoIgnoreCase(apelido)) {
             throw new IllegalArgumentException("Já existe um usuário com este apelido.");
         }
+        if (cpf != null && usuarioRepository.findAll().stream().anyMatch(u -> cpf.equals(u.getCpf()))) {
+            throw new IllegalArgumentException("Já existe um usuário com este CPF.");
+        }
         Usuario usuario = new Usuario();
         usuario.setNome(nome);
         usuario.setEmail(email);
         usuario.setSenha(senha);
         usuario.setApelido(apelido);
+        usuario.setCpf(cpf);
+        usuario.setTelefone(telefone);
         try {
             return usuarioRepository.save(usuario);
         } catch (DataIntegrityViolationException e) {
