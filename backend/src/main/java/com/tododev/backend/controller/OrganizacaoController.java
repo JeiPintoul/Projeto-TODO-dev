@@ -3,10 +3,14 @@ package com.tododev.backend.controller;
 import com.tododev.backend.dto.AdicionarUsuarioOrganizacaoDTO;
 import com.tododev.backend.dto.OrganizacaoResumoDTO;
 import com.tododev.backend.dto.UsuarioOrganizacaoRespostaDTO;
+import com.tododev.backend.dto.RespostaUsuarioDTO;
+import com.tododev.backend.dto.ProjetoResumoDTO;
+import com.tododev.backend.dto.ConviteOrganizacaoDTO;
 import com.tododev.backend.model.Funcao;
 import com.tododev.backend.model.Organizacao;
 import com.tododev.backend.service.OrganizacaoService;
 import com.tododev.backend.service.UsuarioOrganizacaoService;
+import com.tododev.backend.service.ConviteOrganizacaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +24,11 @@ import java.util.List;
 public class OrganizacaoController {
     private final OrganizacaoService organizacaoService;
     private final UsuarioOrganizacaoService usuarioOrganizacaoService;
+    private final ConviteOrganizacaoService conviteOrganizacaoService;
 
     @PostMapping
-    public ResponseEntity<OrganizacaoResumoDTO> criarOrganizacao(@RequestBody @Valid OrganizacaoResumoDTO dto) {
-        Organizacao org = organizacaoService.criarOrganizacao(dto.nome(), dto.descricao());
+    public ResponseEntity<OrganizacaoResumoDTO> criarOrganizacao(@RequestBody @Valid OrganizacaoResumoDTO dto, @RequestParam Long usuarioId) {
+        Organizacao org = organizacaoService.criarOrganizacao(dto.nome(), dto.descricao(), usuarioId);
         return ResponseEntity.ok(new OrganizacaoResumoDTO(org.getId(), org.getNome(), org.getDescricao()));
     }
 
@@ -79,5 +84,52 @@ public class OrganizacaoController {
             .map(org -> new OrganizacaoResumoDTO(org.getId(), org.getNome(), org.getDescricao()))
             .toList();
         return ResponseEntity.ok(orgs);
+    }
+
+    @GetMapping("/usuarios")
+    public ResponseEntity<List<RespostaUsuarioDTO>> listarUsuarios(@RequestParam(required = false) String termo) {
+        List<RespostaUsuarioDTO> usuarios;
+        if (termo != null && !termo.isBlank()) {
+            usuarios = usuarioOrganizacaoService.buscarUsuariosPorTermo(termo);
+        } else {
+            usuarios = usuarioOrganizacaoService.listarTodosUsuarios();
+        }
+        return ResponseEntity.ok(usuarios);
+    }
+
+    @GetMapping("/{organizacaoId}/projetos")
+    public ResponseEntity<List<ProjetoResumoDTO>> listarProjetosPorOrganizacao(@PathVariable Long organizacaoId, @RequestParam(required = false) String termo) {
+        List<ProjetoResumoDTO> projetos;
+        if (termo != null && !termo.isBlank()) {
+            projetos = organizacaoService.buscarProjetosPorOrganizacaoETermo(organizacaoId, termo);
+        } else {
+            projetos = organizacaoService.listarProjetosPorOrganizacao(organizacaoId);
+        }
+        return ResponseEntity.ok(projetos);
+    }
+
+    @PostMapping("/{organizacaoId}/convidar")
+    public ResponseEntity<Void> convidarUsuario(@PathVariable Long organizacaoId, @RequestParam Long usuarioIdLogado, @RequestParam Long usuarioId, @RequestParam Funcao funcao) {
+        // Apenas gerente pode convidar
+        usuarioOrganizacaoService.validarGerente(organizacaoId, usuarioIdLogado);
+        conviteOrganizacaoService.convidarUsuario(organizacaoId, usuarioId, funcao);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/convites/pendentes")
+    public ResponseEntity<List<ConviteOrganizacaoDTO>> listarConvitesPendentes(@RequestParam Long usuarioId) {
+        return ResponseEntity.ok(conviteOrganizacaoService.listarConvitesPendentes(usuarioId));
+    }
+
+    @PostMapping("/convites/{conviteId}/aceitar")
+    public ResponseEntity<Void> aceitarConvite(@PathVariable Long conviteId, @RequestParam Long usuarioId) {
+        conviteOrganizacaoService.aceitarConvite(conviteId, usuarioId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/convites/{conviteId}/recusar")
+    public ResponseEntity<Void> recusarConvite(@PathVariable Long conviteId, @RequestParam Long usuarioId) {
+        conviteOrganizacaoService.recusarConvite(conviteId, usuarioId);
+        return ResponseEntity.ok().build();
     }
 }

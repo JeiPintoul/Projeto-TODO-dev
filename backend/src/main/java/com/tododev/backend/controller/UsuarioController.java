@@ -118,4 +118,11 @@ public class UsuarioController {
         List<OrganizacaoResumoDTO> orgs = usuarioService.listarOrganizacoesPorUsuario(id);
         return ResponseEntity.ok(orgs);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<Void> login(@RequestParam Long usuarioId) {
+        // Simula autenticação: retorna 200 se usuário existe
+        usuarioService.getUsuarioPorId(usuarioId);
+        return ResponseEntity.ok().build();
+    }
 }

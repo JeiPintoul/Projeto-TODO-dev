@@ -38,4 +38,32 @@ class OrganizacaoControllerTest {
         mockMvc.perform(get("/api/organizacoes/usuarios/1/organizacoes?usuarioId=1"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void listarUsuarios_deveRetornar200() throws Exception {
+        when(usuarioOrganizacaoService.listarTodosUsuarios()).thenReturn(List.of());
+        mockMvc.perform(get("/api/organizacoes/usuarios"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void listarUsuarios_comBusca_deveRetornar200() throws Exception {
+        when(usuarioOrganizacaoService.buscarUsuariosPorTermo("ana")).thenReturn(List.of());
+        mockMvc.perform(get("/api/organizacoes/usuarios?termo=ana"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void listarProjetosPorOrganizacao_deveRetornar200() throws Exception {
+        when(organizacaoService.listarProjetosPorOrganizacao(1L)).thenReturn(List.of());
+        mockMvc.perform(get("/api/organizacoes/1/projetos"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void listarProjetosPorOrganizacao_comBusca_deveRetornar200() throws Exception {
+        when(organizacaoService.buscarProjetosPorOrganizacaoETermo(1L, "dev")).thenReturn(List.of());
+        mockMvc.perform(get("/api/organizacoes/1/projetos?termo=dev"))
+                .andExpect(status().isOk());
+    }
 }

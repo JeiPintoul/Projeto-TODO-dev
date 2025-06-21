@@ -2,6 +2,7 @@ package com.tododev.backend.service;
 
 import com.tododev.backend.dto.AdicionarUsuarioOrganizacaoDTO;
 import com.tododev.backend.dto.UsuarioOrganizacaoRespostaDTO;
+import com.tododev.backend.dto.RespostaUsuarioDTO;
 import com.tododev.backend.model.Funcao;
 import com.tododev.backend.model.Organizacao;
 import com.tododev.backend.model.Usuario;
@@ -103,5 +104,28 @@ public class UsuarioOrganizacaoService {
             throw new RecursoNaoEncontradoException("Usuário não faz parte da organização.");
         }
         usuarioOrganizacaoRepository.delete(uo);
+    }
+
+    public List<RespostaUsuarioDTO> listarTodosUsuarios() {
+        return usuarioRepository.findAll().stream()
+            .map(u -> new RespostaUsuarioDTO(u.getId(), u.getNome(), u.getEmail(), u.getApelido(), List.of(), List.of()))
+            .toList();
+    }
+
+    public List<RespostaUsuarioDTO> buscarUsuariosPorTermo(String termo) {
+        String termoLower = termo.toLowerCase();
+        return usuarioRepository.findAll().stream()
+            .filter(u -> u.getNome().toLowerCase().contains(termoLower)
+                || u.getEmail().toLowerCase().contains(termoLower)
+                || (u.getApelido() != null && u.getApelido().toLowerCase().contains(termoLower)))
+            .map(u -> new RespostaUsuarioDTO(u.getId(), u.getNome(), u.getEmail(), u.getApelido(), List.of(), List.of()))
+            .toList();
+    }
+
+    public void validarGerente(Long organizacaoId, Long usuarioId) {
+        var gerente = usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(usuarioId, organizacaoId);
+        if (gerente == null || gerente.getFuncao() != Funcao.GERENTE) {
+            throw new IllegalStateException("Apenas gerente pode realizar esta ação.");
+        }
     }
 }

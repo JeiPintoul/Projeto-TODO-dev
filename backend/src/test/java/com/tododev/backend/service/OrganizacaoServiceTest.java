@@ -4,6 +4,8 @@ import com.tododev.backend.model.Organizacao;
 import com.tododev.backend.model.Usuario;
 import com.tododev.backend.model.UsuarioOrganizacao;
 import com.tododev.backend.repository.OrganizacaoRepository;
+import com.tododev.backend.repository.UsuarioRepository;
+import com.tododev.backend.repository.UsuarioOrganizacaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,6 +20,10 @@ import static org.mockito.Mockito.*;
 class OrganizacaoServiceTest {
     @Mock
     private OrganizacaoRepository organizacaoRepository;
+    @Mock
+    private UsuarioRepository usuarioRepository;
+    @Mock
+    private UsuarioOrganizacaoRepository usuarioOrganizacaoRepository;
     @InjectMocks
     private OrganizacaoService organizacaoService;
 
@@ -32,9 +38,13 @@ class OrganizacaoServiceTest {
         org.setId(1L);
         org.setNome("Org1");
         org.setDescricao("Desc");
+        Usuario usuario = new Usuario();
+        usuario.setId(2L);
         when(organizacaoRepository.findAll()).thenReturn(new ArrayList<>());
+        when(usuarioRepository.findById(2L)).thenReturn(Optional.of(usuario));
         when(organizacaoRepository.save(any(Organizacao.class))).thenReturn(org);
-        Organizacao salvo = organizacaoService.criarOrganizacao("Org1", "Desc");
+        when(usuarioOrganizacaoRepository.save(any())).thenReturn(null);
+        Organizacao salvo = organizacaoService.criarOrganizacao("Org1", "Desc", 2L);
         assertEquals("Org1", salvo.getNome());
     }
 
@@ -44,7 +54,7 @@ class OrganizacaoServiceTest {
         org.setNome("Org1");
         when(organizacaoRepository.findAll()).thenReturn(List.of(org));
         assertThrows(IllegalArgumentException.class, () ->
-            organizacaoService.criarOrganizacao("Org1", "Desc")
+            organizacaoService.criarOrganizacao("Org1", "Desc", 1L)
         );
     }
 
