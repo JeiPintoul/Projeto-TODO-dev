@@ -10,7 +10,6 @@ import com.tododev.backend.service.TarefaService;
 
 import lombok.RequiredArgsConstructor;
 import com.tododev.backend.dto.TarefaRespostaDTO;
-import com.tododev.backend.dto.ArtefatoTarefaRespostaDTO;
 
 @RequiredArgsConstructor
 @RestController
@@ -19,20 +18,49 @@ public class TarefaController {
 
     private final TarefaService tarefaService;
 
+    /**
+     * Cria uma nova tarefa no projeto e retorna o DTO de resposta.
+     * @param organizacaoId ID da organização
+     * @param projetoId ID do projeto
+     * @param usuarioId ID do usuário criador
+     * @param tarefa Dados da tarefa recebidos do frontend
+     * @return TarefaRespostaDTO compatível com o frontend
+     */
     @PostMapping
     public ResponseEntity<TarefaRespostaDTO> criarTarefa(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestParam Long usuarioId, @RequestBody Tarefa tarefa) {
         // Regra: só membros do projeto podem criar tarefa
-        Tarefa nova = tarefaService.criarTarefa(projetoId, usuarioId, tarefa.getTitulo(), tarefa.getDescricao(), tarefa.getArtefatos());
-        return ResponseEntity.ok(toDTO(nova));
+        TarefaRespostaDTO nova = tarefaService.criarTarefa(
+            projetoId,
+            usuarioId,
+            tarefa.getTitulo(),
+            tarefa.getDescricao(),
+            tarefa.getStatus() != null ? tarefa.getStatus().name() : null,
+            tarefa.getPriority(),
+            tarefa.getArtefatos()
+        );
+        return ResponseEntity.ok(nova);
     }
 
+    /**
+     * Edita uma tarefa existente e retorna o DTO atualizado.
+     */
     @PutMapping("/{tarefaId}")
     public ResponseEntity<TarefaRespostaDTO> editarTarefa(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @PathVariable Long tarefaId, @RequestParam Long usuarioId, @RequestBody Tarefa tarefa) {
         // Regra: só responsável ou gerente pode editar tarefa
-        Tarefa editada = tarefaService.editarTarefa(tarefaId, usuarioId, tarefa.getTitulo(), tarefa.getDescricao());
-        return ResponseEntity.ok(toDTO(editada));
+        TarefaRespostaDTO editada = tarefaService.editarTarefa(
+            tarefaId,
+            usuarioId,
+            tarefa.getTitulo(),
+            tarefa.getDescricao(),
+            tarefa.getStatus() != null ? tarefa.getStatus().name() : null,
+            tarefa.getPriority()
+        );
+        return ResponseEntity.ok(editada);
     }
 
+    /**
+     * Deleta uma tarefa do projeto.
+     */
     @DeleteMapping("/{tarefaId}")
     public ResponseEntity<Void> deletarTarefa(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @PathVariable Long tarefaId, @RequestParam Long usuarioId) {
         // Regra: só responsável ou gerente pode deletar tarefa
@@ -40,20 +68,29 @@ public class TarefaController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Inicia uma tarefa, marcando o usuário responsável.
+     */
     @PostMapping("/{tarefaId}/iniciar")
     public ResponseEntity<TarefaRespostaDTO> iniciarTarefa(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @PathVariable Long tarefaId, @RequestParam Long usuarioId) {
         // Regra: só responsável pode iniciar tarefa
-        Tarefa tarefa = tarefaService.iniciarTarefa(tarefaId, usuarioId);
-        return ResponseEntity.ok(toDTO(tarefa));
+        TarefaRespostaDTO tarefa = tarefaService.iniciarTarefa(tarefaId, usuarioId);
+        return ResponseEntity.ok(tarefa);
     }
 
+    /**
+     * Marca uma tarefa como concluída.
+     */
     @PostMapping("/{tarefaId}/concluir")
     public ResponseEntity<TarefaRespostaDTO> concluirTarefa(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @PathVariable Long tarefaId, @RequestParam Long usuarioId) {
         // Regra: só responsável pode concluir tarefa
-        Tarefa tarefa = tarefaService.completarTarefa(tarefaId, usuarioId);
-        return ResponseEntity.ok(toDTO(tarefa));
+        TarefaRespostaDTO tarefa = tarefaService.completarTarefa(tarefaId, usuarioId);
+        return ResponseEntity.ok(tarefa);
     }
 
+    /**
+     * Adiciona um artefato a uma tarefa existente.
+     */
     @PostMapping("/{tarefaId}/artefatos")
     public ResponseEntity<Void> adicionarArtefato(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @PathVariable Long tarefaId, @RequestParam Long usuarioId, @RequestBody ArtefatoTarefa artefato) {
         // Regra: só responsável pode adicionar artefato
@@ -61,43 +98,24 @@ public class TarefaController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Lista todas as tarefas do projeto, retornando DTOs compatíveis.
+     */
     @GetMapping
     public ResponseEntity<List<TarefaRespostaDTO>> listarTarefas(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestParam Long usuarioId) {
         // Regra: só membros do projeto podem listar tarefas
-        List<TarefaRespostaDTO> tarefas = tarefaService.getTarefasPorProjeto(projetoId)
-            .stream().map(this::toDTO).toList();
+        List<TarefaRespostaDTO> tarefas = tarefaService.getTarefasPorProjeto(projetoId);
         return ResponseEntity.ok(tarefas);
     }
 
+    /**
+     * Busca uma tarefa por ID, retornando o DTO de resposta se encontrada.
+     */
     @GetMapping("/{tarefaId}")
     public ResponseEntity<TarefaRespostaDTO> getTarefaPorId(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @PathVariable Long tarefaId, @RequestParam Long usuarioId) {
         // Regra: só membros do projeto podem ver tarefa
         return tarefaService.getTarefaPorId(tarefaId)
-                .map(t -> ResponseEntity.ok(toDTO(t)))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    private TarefaRespostaDTO toDTO(Tarefa tarefa) {
-        List<ArtefatoTarefaRespostaDTO> artefatos = tarefa.getArtefatos() != null ?
-            tarefa.getArtefatos().stream().map(a -> new ArtefatoTarefaRespostaDTO(
-                a.getId(),
-                a.getConteudo(),
-                a.getEditado(),
-                a.getTipo()
-            )).toList() : List.of();
-        return new TarefaRespostaDTO(
-            tarefa.getId(),
-            tarefa.getTitulo(),
-            tarefa.getDescricao(),
-            tarefa.getStatus() != null ? tarefa.getStatus().name() : null,
-            tarefa.getDataCriacao(),
-            tarefa.getDataTermino(),
-            tarefa.getTempoGasto(),
-            tarefa.getProjeto() != null ? tarefa.getProjeto().getId() : null,
-            tarefa.getGerente() != null ? tarefa.getGerente().getId() : null,
-            tarefa.getUsuarioEmAndamento() != null ? tarefa.getUsuarioEmAndamento().getId() : null,
-            tarefa.getUsuarioConcluido() != null ? tarefa.getUsuarioConcluido().getId() : null,
-            artefatos
-        );
     }
 }

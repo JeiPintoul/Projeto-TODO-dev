@@ -60,6 +60,15 @@ public class Tarefa {
     @JoinColumn(name = "usuario_concluido_id")
     private Usuario usuarioConcluido;
 
+    @Column
+    private String priority;
+
+    @Column
+    private String color;
+
+    @Column
+    private String artefacts;
+
     @Builder.Default
     @OneToMany(mappedBy = "tarefa", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ArtefatoTarefa> artefatos = new ArrayList<>();

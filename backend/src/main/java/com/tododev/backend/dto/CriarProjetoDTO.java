@@ -14,9 +14,12 @@ public record CriarProjetoDTO(
     String dataVencimento,
     String artefatos,
     @NotNull(message = "Lista de organizações é obrigatória")
-    List<Long> companyIds,
+    List<CompanyData> companies,
     @NotNull(message = "Lista de gerentes é obrigatória")
-    List<Long> managerIds,
+    List<UserData> managers,
     @NotNull(message = "Lista de trabalhadores é obrigatória")
-    List<Long> workerIds
-) {}
+    List<UserData> workers
+) {
+    public record CompanyData(String id, String name, String description) {}
+    public record UserData(String id, String name) {}
+}

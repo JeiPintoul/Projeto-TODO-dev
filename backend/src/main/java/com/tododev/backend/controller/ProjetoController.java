@@ -1,7 +1,6 @@
 package com.tododev.backend.controller;
 
 import com.tododev.backend.dto.*;
-import com.tododev.backend.model.Projeto;
 import com.tododev.backend.service.ProjetoService;
 
 import jakarta.validation.Valid;
@@ -19,24 +18,22 @@ public class ProjetoController {
     private final ProjetoService projetoService;
 
     @PostMapping
-    public ResponseEntity<ProjetoResumoDTO> criarProjeto(@RequestParam Long usuarioId, @RequestBody @Valid CriarProjetoDTO projetoDTO) {
-        Projeto projeto = projetoService.criarProjeto(projetoDTO, usuarioId);
-        return ResponseEntity.ok(new ProjetoResumoDTO(projeto.getId(), projeto.getNome()));
+    public ResponseEntity<ProjetoRespostaDTO> criarProjeto(@RequestParam Long usuarioId, @RequestBody @Valid CriarProjetoDTO projetoDTO) {
+        ProjetoRespostaDTO projeto = projetoService.criarProjeto(projetoDTO, usuarioId);
+        return ResponseEntity.ok(projeto);
     }
 
     @GetMapping("/{projetoId}")
-    public ResponseEntity<ProjetoResumoDTO> getProjetoPorId(@PathVariable Long projetoId, @RequestParam Long usuarioId) {
-        // Regra: só membros do projeto podem visualizar
+    public ResponseEntity<ProjetoRespostaDTO> getProjetoPorId(@PathVariable Long projetoId, @RequestParam Long usuarioId) {
         return projetoService.getProjetoPorId(projetoId, usuarioId)
-                .map(p -> ResponseEntity.ok(new ProjetoResumoDTO(p.getId(), p.getNome())))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{projetoId}")
-    public ResponseEntity<ProjetoResumoDTO> atualizarProjeto(@PathVariable Long projetoId, @RequestParam Long usuarioId, @RequestBody @Valid AtualizarProjetoDTO dto) {
-        // Regra: só gerente pode atualizar
-        Projeto atualizado = projetoService.atualizarProjeto(projetoId, usuarioId, dto);
-        return ResponseEntity.ok(new ProjetoResumoDTO(atualizado.getId(), atualizado.getNome()));
+    public ResponseEntity<ProjetoRespostaDTO> atualizarProjeto(@PathVariable Long projetoId, @RequestParam Long usuarioId, @RequestBody @Valid AtualizarProjetoDTO dto) {
+        ProjetoRespostaDTO atualizado = projetoService.atualizarProjeto(projetoId, usuarioId, dto);
+        return ResponseEntity.ok(atualizado);
     }
 
     @PostMapping("/{projetoId}/membros")

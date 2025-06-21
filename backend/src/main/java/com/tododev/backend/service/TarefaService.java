@@ -1,7 +1,6 @@
 package com.tododev.backend.service;
 
 import com.tododev.backend.dto.TarefaRespostaDTO;
-import com.tododev.backend.dto.ArtefatoTarefaRespostaDTO;
 import com.tododev.backend.exception.RecursoNaoEncontradoException;
 import com.tododev.backend.model.*;
 import com.tododev.backend.repository.*;
@@ -32,9 +31,28 @@ public class TarefaService {
 
     public static final String MSG_TAREFA_NAO_ENCONTRADA = "Tarefa não encontrada com o ID: ";
 
-    public Tarefa criarTarefa(Long projetoId, Long gerenteId, String titulo, String descricao, 
-                            List<ArtefatoTarefa> artefatos) {
+    /**
+     * Converte uma entidade Tarefa para o DTO de resposta, garantindo compatibilidade total com o frontend.
+     */
+    private TarefaRespostaDTO toTarefaRespostaDTO(Tarefa t) {
+        return new TarefaRespostaDTO(
+            t.getId() != null ? t.getId().toString() : null,
+            t.getProjeto() != null ? t.getProjeto().getId().toString() : null,
+            t.getTitulo(),
+            t.getDescricao(),
+            t.getStatus() != null ? t.getStatus().name().toLowerCase() : null,
+            t.getPriority(),
+            t.getColor(),
+            t.getDataCriacao() != null ? t.getDataCriacao().toString() : null,
+            t.getDataTermino() != null ? t.getDataTermino().toString() : null,
+            t.getArtefacts() // Garante compatibilidade com o frontend
+        );
+    }
 
+    /**
+     * Cria uma nova tarefa e retorna o DTO de resposta compatível com o frontend.
+     */
+    public TarefaRespostaDTO criarTarefa(Long projetoId, Long gerenteId, String titulo, String descricao, String status, String priority, List<ArtefatoTarefa> artefatos) {
         Projeto projeto = projetoRepository.findById(projetoId)
             .orElseThrow(() -> new RecursoNaoEncontradoException("Projeto não encontrado com o ID: " + projetoId));
         Usuario gerente = usuarioRepository.findById(gerenteId)
@@ -45,7 +63,8 @@ public class TarefaService {
             .projeto(projeto)
             .titulo(titulo)
             .descricao(descricao)
-            .status(StatusTarefa.PENDENTE)
+            .status(status != null ? StatusTarefa.fromString(status) : StatusTarefa.PENDENTE)
+            .priority(priority)
             .dataCriacao(LocalDateTime.now())
             .build();
 
@@ -62,65 +81,71 @@ public class TarefaService {
             tarefaSalva = tarefaRepository.save(tarefaSalva);
         }
 
-        return tarefaSalva;
+        return toTarefaRespostaDTO(tarefaSalva);
     }
 
-    public List<Tarefa> getTarefasPorProjeto(Long projetoId) {
-        return tarefaRepository.findByProjetoId(projetoId);
+    /**
+     * Lista todas as tarefas de um projeto, retornando DTOs compatíveis com o frontend.
+     */
+    public List<TarefaRespostaDTO> getTarefasPorProjeto(Long projetoId) {
+        return tarefaRepository.findByProjetoId(projetoId).stream()
+            .map(this::toTarefaRespostaDTO)
+            .toList();
     }
 
-    public Optional<Tarefa> getTarefaPorId(Long tarefaId) {
-        return tarefaRepository.findById(tarefaId);
+    /**
+     * Busca uma tarefa por ID, retornando o DTO de resposta se encontrada.
+     */
+    public Optional<TarefaRespostaDTO> getTarefaPorId(Long tarefaId) {
+        return tarefaRepository.findById(tarefaId)
+            .map(this::toTarefaRespostaDTO);
     }
 
-    public Tarefa iniciarTarefa(Long tarefaId, Long usuarioId) {
-
+    /**
+     * Inicia uma tarefa, marcando o usuário responsável, e retorna o DTO atualizado.
+     */
+    public TarefaRespostaDTO iniciarTarefa(Long tarefaId, Long usuarioId) {
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_TAREFA_NAO_ENCONTRADA + tarefaId));
-
         Usuario usuario = usuarioRepository.findById(usuarioId)
             .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario não encontrado com o ID: " + usuarioId));
-
         if (tarefa.getStatus() == StatusTarefa.EM_PROGRESSO || tarefa.getStatus() == StatusTarefa.CONCLUIDO) {
             throw new IllegalStateException("Tarefa já está em andamento ou finalizada.");
         }
         tarefa.setStatus(StatusTarefa.EM_PROGRESSO);
         tarefa.setUsuarioEmAndamento(usuario);
-        // Optionally reset endDate and timeSpent when starting
         tarefa.setDataTermino(null);
         tarefa.setTempoGasto(null);
-
-        // Save the task once after all updates
         tarefaRepository.save(tarefa);
-        return tarefa;
+        return toTarefaRespostaDTO(tarefa);
     }
 
-    public Tarefa completarTarefa(Long tarefaId, Long usuarioId) {
-
+    /**
+     * Marca uma tarefa como concluída, atualizando o usuário e datas, e retorna o DTO atualizado.
+     */
+    public TarefaRespostaDTO completarTarefa(Long tarefaId, Long usuarioId) {
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_TAREFA_NAO_ENCONTRADA + tarefaId));
-
         Usuario usuario = usuarioRepository.findById(usuarioId)
             .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario não encontrado com o ID: " + usuarioId));
-
         tarefa.setStatus(StatusTarefa.CONCLUIDO);
         tarefa.setUsuarioConcluido(usuario);
         LocalDateTime agora = LocalDateTime.now();
         tarefa.setDataTermino(agora);
-
         if (tarefa.getDataCriacao() != null) {
             Duration duracao = Duration.between(tarefa.getDataCriacao(), agora);
             tarefa.setTempoGasto(duracao.toHours());
         } else {
             tarefa.setTempoGasto(null);
         }
-
         tarefaRepository.save(tarefa);
-        return tarefa;
-
+        return toTarefaRespostaDTO(tarefa);
     }
 
-    public Tarefa editarTarefa(Long tarefaId, Long gerenteId, String titulo, String descricao) {
+    /**
+     * Edita os dados de uma tarefa e retorna o DTO atualizado.
+     */
+    public TarefaRespostaDTO editarTarefa(Long tarefaId, Long gerenteId, String titulo, String descricao, String status, String priority) {
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_TAREFA_NAO_ENCONTRADA + tarefaId));
         if (!tarefa.getGerente().getId().equals(gerenteId)) {
@@ -128,9 +153,15 @@ public class TarefaService {
         }
         tarefa.setTitulo(titulo);
         tarefa.setDescricao(descricao);
-        return tarefaRepository.save(tarefa);
+        if (status != null) tarefa.setStatus(StatusTarefa.fromString(status));
+        if (priority != null) tarefa.setPriority(priority);
+        tarefaRepository.save(tarefa);
+        return toTarefaRespostaDTO(tarefa);
     }
 
+    /**
+     * Deleta uma tarefa, apenas se o gerente for o responsável.
+     */
     public void deletarTarefa(Long tarefaId, Long gerenteId) {
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_TAREFA_NAO_ENCONTRADA + tarefaId));
@@ -140,6 +171,9 @@ public class TarefaService {
         tarefaRepository.delete(tarefa);
     }
 
+    /**
+     * Adiciona um artefato a uma tarefa existente.
+     */
     public void adicionarArtefatoATarefa(Long tarefaId, ArtefatoTarefa artefato) {
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_TAREFA_NAO_ENCONTRADA + tarefaId));
@@ -148,26 +182,14 @@ public class TarefaService {
         artefatoTarefaRepository.save(artefato);
     }
 
+    /**
+     * Lista todas as tarefas associadas a um usuário (em andamento ou concluídas), retornando DTOs compatíveis.
+     */
     public List<TarefaRespostaDTO> getTarefasPorUsuario(Long usuarioId) {
         return tarefaRepository.findAll().stream()
             .filter(t -> (t.getUsuarioEmAndamento() != null && t.getUsuarioEmAndamento().getId().equals(usuarioId))
                 || (t.getUsuarioConcluido() != null && t.getUsuarioConcluido().getId().equals(usuarioId)))
-            .map(t -> new TarefaRespostaDTO(
-                t.getId(),
-                t.getTitulo(),
-                t.getDescricao(),
-                t.getStatus() != null ? t.getStatus().name() : null,
-                t.getDataCriacao(),
-                t.getDataTermino(),
-                t.getTempoGasto(),
-                t.getProjeto() != null ? t.getProjeto().getId() : null,
-                t.getGerente() != null ? t.getGerente().getId() : null,
-                t.getUsuarioEmAndamento() != null ? t.getUsuarioEmAndamento().getId() : null,
-                t.getUsuarioConcluido() != null ? t.getUsuarioConcluido().getId() : null,
-                t.getArtefatos() != null ? t.getArtefatos().stream().map(a -> new ArtefatoTarefaRespostaDTO(
-                    a.getId(), a.getConteudo(), a.getEditado(), a.getTipo()
-                )).toList() : List.of()
-            ))
+            .map(this::toTarefaRespostaDTO)
             .toList();
     }
 
