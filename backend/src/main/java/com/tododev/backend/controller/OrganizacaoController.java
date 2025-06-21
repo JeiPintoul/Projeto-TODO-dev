@@ -68,4 +68,16 @@ public class OrganizacaoController {
         usuarioOrganizacaoService.removerUsuario(organizacaoId, usuarioId, usuarioIdLogado);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/usuarios/{id}/organizacoes")
+    public ResponseEntity<List<OrganizacaoResumoDTO>> listarOrganizacoesPorUsuario(@PathVariable Long id, @RequestParam Long usuarioId) {
+        // Regra: só o próprio usuário pode ver suas organizações
+        if (!id.equals(usuarioId)) {
+            return ResponseEntity.status(403).build();
+        }
+        List<OrganizacaoResumoDTO> orgs = organizacaoService.listarOrganizacoes(id).stream()
+            .map(org -> new OrganizacaoResumoDTO(org.getId(), org.getNome(), org.getDescricao()))
+            .toList();
+        return ResponseEntity.ok(orgs);
+    }
 }

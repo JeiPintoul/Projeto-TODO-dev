@@ -30,14 +30,6 @@ public class ProjetoController {
         return ResponseEntity.ok(new ProjetoResumoDTO(projeto.getId(), projeto.getNome()));
     }
 
-    @GetMapping
-    public ResponseEntity<List<ProjetoResumoDTO>> getProjetos(@PathVariable Long organizacaoId, @RequestParam Long usuarioId) {
-        // Regra: só membros da organização podem listar projetos
-        List<ProjetoResumoDTO> projects = projetoService.getProjetosPorOrganizacao(organizacaoId, usuarioId)
-            .stream().map(p -> new ProjetoResumoDTO(p.getId(), p.getNome())).toList();
-        return ResponseEntity.ok(projects);
-    }
-
     @GetMapping("/{projetoId}")
     public ResponseEntity<ProjetoResumoDTO> getProjetoPorId(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestParam Long usuarioId) {
         // Regra: só membros do projeto podem visualizar

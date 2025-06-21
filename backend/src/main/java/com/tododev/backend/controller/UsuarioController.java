@@ -10,6 +10,7 @@ import com.tododev.backend.dto.ProjetoResumoDTO;
 import com.tododev.backend.dto.TarefaRespostaDTO;
 import com.tododev.backend.service.ProjetoService;
 import com.tododev.backend.service.TarefaService;
+import com.tododev.backend.dto.OrganizacaoResumoDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -106,5 +107,15 @@ public class UsuarioController {
         }
         List<ProjetoResumoDTO> projetos = projetoService.listarProjetosPessoais(usuarioId);
         return ResponseEntity.ok(projetos);
+    }
+
+    @GetMapping("/{id}/organizacoes")
+    public ResponseEntity<List<OrganizacaoResumoDTO>> listarOrganizacoesPorUsuario(@PathVariable Long id, @RequestParam Long usuarioId) {
+        // Regra: só o próprio usuário pode ver suas organizações
+        if (!id.equals(usuarioId)) {
+            return ResponseEntity.status(403).build();
+        }
+        List<OrganizacaoResumoDTO> orgs = usuarioService.listarOrganizacoesPorUsuario(id);
+        return ResponseEntity.ok(orgs);
     }
 }

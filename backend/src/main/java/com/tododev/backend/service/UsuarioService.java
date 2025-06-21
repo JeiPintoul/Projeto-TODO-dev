@@ -2,6 +2,9 @@ package com.tododev.backend.service;
 
 import com.tododev.backend.model.Usuario;
 import com.tododev.backend.repository.UsuarioRepository;
+import com.tododev.backend.dto.OrganizacaoResumoDTO;
+import com.tododev.backend.model.UsuarioOrganizacao;
+import com.tododev.backend.repository.UsuarioOrganizacaoRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -11,12 +14,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 @Transactional
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
+    private final UsuarioOrganizacaoRepository usuarioOrganizacaoRepository;
 
     public Usuario criarUsuario(String nome, String email, String senha, String apelido) {
         if (usuarioRepository.existsByEmailIgnoreCase(email)) {
@@ -71,5 +76,16 @@ public class UsuarioService {
     public void deletarUsuario(Long id) {
         Usuario usuario = getUsuarioPorId(id);
         usuarioRepository.delete(usuario);
+    }
+
+    public List<OrganizacaoResumoDTO> listarOrganizacoesPorUsuario(Long usuarioId) {
+        List<UsuarioOrganizacao> usuarioOrgs = usuarioOrganizacaoRepository.findByUsuarioId(usuarioId);
+        return usuarioOrgs.stream()
+            .map(uo -> new OrganizacaoResumoDTO(
+                uo.getOrganizacao().getId(),
+                uo.getOrganizacao().getNome(),
+                uo.getOrganizacao().getDescricao()
+            ))
+            .collect(Collectors.toList());
     }
 }
