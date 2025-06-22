@@ -99,7 +99,7 @@ public class ProjetoService {
         if (usuarioOrg == null) {
             throw new IllegalStateException("Usuário não faz parte da organização.");
         }
-        return projetoRepository.findByOrganizacaoId(organizacaoId).stream()
+        return projetoRepository.findByOrganizacoes_Id(organizacaoId).stream()
             .map(this::toProjetoRespostaDTO)
             .toList();
     }

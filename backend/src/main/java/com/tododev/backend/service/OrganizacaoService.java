@@ -64,14 +64,14 @@ public class OrganizacaoService {
     }
 
     public List<ProjetoResumoDTO> listarProjetosPorOrganizacao(Long organizacaoId) {
-        return projetoRepository.findByOrganizacaoId(organizacaoId).stream()
+        return projetoRepository.findByOrganizacoes_Id(organizacaoId).stream()
             .map(p -> new ProjetoResumoDTO(p.getId(), p.getNome()))
             .toList();
     }
 
     public List<ProjetoResumoDTO> buscarProjetosPorOrganizacaoETermo(Long organizacaoId, String termo) {
         String termoLower = termo.toLowerCase();
-        return projetoRepository.findByOrganizacaoId(organizacaoId).stream()
+        return projetoRepository.findByOrganizacoes_Id(organizacaoId).stream()
             .filter(p -> p.getNome().toLowerCase().contains(termoLower)
                 || (p.getDescricao() != null && p.getDescricao().toLowerCase().contains(termoLower)))
             .map(p -> new ProjetoResumoDTO(p.getId(), p.getNome()))
