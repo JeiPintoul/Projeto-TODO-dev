@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/projetos")
@@ -34,20 +33,6 @@ public class ProjetoController {
     public ResponseEntity<ProjetoRespostaDTO> atualizarProjeto(@PathVariable Long projetoId, @RequestParam Long usuarioId, @RequestBody @Valid AtualizarProjetoDTO dto) {
         ProjetoRespostaDTO atualizado = projetoService.atualizarProjeto(projetoId, usuarioId, dto);
         return ResponseEntity.ok(atualizado);
-    }
-
-    @PostMapping("/{projetoId}/membros")
-    public ResponseEntity<Void> adicionarMembros(@PathVariable Long projetoId, @RequestParam Long usuarioId, @RequestBody @Valid List<AdicionarMembroProjetoDTO> membros) {
-        // Regra: só gerente pode adicionar membros
-        projetoService.adicionarMembrosAoProjeto(projetoId, usuarioId, membros);
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/{projetoId}/artefatos")
-    public ResponseEntity<Void> adicionarArtefato(@PathVariable Long projetoId, @RequestParam Long usuarioId, @RequestBody @Valid AdicionarArtefatoProjetoDTO dto) {
-        // Regra: só membros do projeto podem adicionar artefatos
-        projetoService.adicionarArtefatoAoProjeto(projetoId, usuarioId, dto);
-        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{projetoId}")

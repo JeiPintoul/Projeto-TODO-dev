@@ -1,7 +1,5 @@
 package com.tododev.backend.controller;
 
-import com.tododev.backend.model.Tarefa;
-import com.tododev.backend.model.ArtefatoTarefa;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -10,6 +8,7 @@ import com.tododev.backend.service.TarefaService;
 
 import lombok.RequiredArgsConstructor;
 import com.tododev.backend.dto.TarefaRespostaDTO;
+import com.tododev.backend.dto.TarefaRequestDTO;
 
 @RequiredArgsConstructor
 @RestController
@@ -27,16 +26,16 @@ public class TarefaController {
      * @return TarefaRespostaDTO compatível com o frontend
      */
     @PostMapping
-    public ResponseEntity<TarefaRespostaDTO> criarTarefa(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestParam Long usuarioId, @RequestBody Tarefa tarefa) {
+    public ResponseEntity<TarefaRespostaDTO> criarTarefa(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @RequestParam Long usuarioId, @RequestBody TarefaRequestDTO tarefa) {
         // Regra: só membros do projeto podem criar tarefa
         TarefaRespostaDTO nova = tarefaService.criarTarefa(
             projetoId,
             usuarioId,
-            tarefa.getTitulo(),
-            tarefa.getDescricao(),
-            tarefa.getStatus() != null ? tarefa.getStatus().name() : null,
-            tarefa.getPriority(),
-            tarefa.getArtefatos()
+            tarefa.name(),
+            tarefa.description(),
+            tarefa.status(),
+            tarefa.priority(),
+            tarefa.artefacts()
         );
         return ResponseEntity.ok(nova);
     }
@@ -45,15 +44,16 @@ public class TarefaController {
      * Edita uma tarefa existente e retorna o DTO atualizado.
      */
     @PutMapping("/{tarefaId}")
-    public ResponseEntity<TarefaRespostaDTO> editarTarefa(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @PathVariable Long tarefaId, @RequestParam Long usuarioId, @RequestBody Tarefa tarefa) {
+    public ResponseEntity<TarefaRespostaDTO> editarTarefa(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @PathVariable Long tarefaId, @RequestParam Long usuarioId, @RequestBody TarefaRequestDTO tarefa) {
         // Regra: só responsável ou gerente pode editar tarefa
         TarefaRespostaDTO editada = tarefaService.editarTarefa(
             tarefaId,
             usuarioId,
-            tarefa.getTitulo(),
-            tarefa.getDescricao(),
-            tarefa.getStatus() != null ? tarefa.getStatus().name() : null,
-            tarefa.getPriority()
+            tarefa.name(),
+            tarefa.description(),
+            tarefa.status(),
+            tarefa.priority(),
+            tarefa.artefacts()
         );
         return ResponseEntity.ok(editada);
     }
@@ -86,16 +86,6 @@ public class TarefaController {
         // Regra: só responsável pode concluir tarefa
         TarefaRespostaDTO tarefa = tarefaService.completarTarefa(tarefaId, usuarioId);
         return ResponseEntity.ok(tarefa);
-    }
-
-    /**
-     * Adiciona um artefato a uma tarefa existente.
-     */
-    @PostMapping("/{tarefaId}/artefatos")
-    public ResponseEntity<Void> adicionarArtefato(@PathVariable Long organizacaoId, @PathVariable Long projetoId, @PathVariable Long tarefaId, @RequestParam Long usuarioId, @RequestBody ArtefatoTarefa artefato) {
-        // Regra: só responsável pode adicionar artefato
-        tarefaService.adicionarArtefatoATarefa(tarefaId, artefato);
-        return ResponseEntity.ok().build();
     }
 
     /**

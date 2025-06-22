@@ -33,7 +33,7 @@ public class Projeto {
     private String cor;
 
     @Column
-    private String artefatos;
+    private String artefacts;
 
     @Column
     private String status;

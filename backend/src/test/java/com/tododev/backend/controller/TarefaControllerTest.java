@@ -1,6 +1,5 @@
 package com.tododev.backend.controller;
 
-import com.tododev.backend.dto.TarefaRespostaDTO;
 import com.tododev.backend.service.TarefaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

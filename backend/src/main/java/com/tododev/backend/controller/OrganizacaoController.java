@@ -1,11 +1,11 @@
 package com.tododev.backend.controller;
 
-import com.tododev.backend.dto.AdicionarUsuarioOrganizacaoDTO;
 import com.tododev.backend.dto.OrganizacaoResumoDTO;
 import com.tododev.backend.dto.UsuarioOrganizacaoRespostaDTO;
 import com.tododev.backend.dto.UsuarioRespostaDTO;
 import com.tododev.backend.dto.ProjetoResumoDTO;
 import com.tododev.backend.dto.ConviteOrganizacaoDTO;
+import com.tododev.backend.dto.UsuarioOrganizacaoRequestDTO;
 import com.tododev.backend.model.Funcao;
 import com.tododev.backend.model.Organizacao;
 import com.tododev.backend.service.OrganizacaoService;
@@ -55,7 +55,7 @@ public class OrganizacaoController {
     }
 
     @PostMapping("/{organizacaoId}/usuarios")
-    public ResponseEntity<UsuarioOrganizacaoRespostaDTO> adicionarUsuarioOrganizacao(@PathVariable Long organizacaoId, @RequestParam Long usuarioId, @RequestBody @Valid AdicionarUsuarioOrganizacaoDTO dto) {
+    public ResponseEntity<UsuarioOrganizacaoRespostaDTO> adicionarUsuarioOrganizacao(@PathVariable Long organizacaoId, @RequestParam Long usuarioId, @RequestBody @Valid UsuarioOrganizacaoRequestDTO dto) {
         // Regra: só gerente pode adicionar usuário
         return ResponseEntity.ok(usuarioOrganizacaoService.adicionarUsuario(organizacaoId, usuarioId, dto));
     }

@@ -1,6 +1,6 @@
 package com.tododev.backend.service;
 
-import com.tododev.backend.dto.AdicionarUsuarioOrganizacaoDTO;
+import com.tododev.backend.dto.UsuarioOrganizacaoRequestDTO;
 import com.tododev.backend.dto.UsuarioOrganizacaoRespostaDTO;
 import com.tododev.backend.dto.UsuarioRespostaDTO;
 import com.tododev.backend.model.Funcao;
@@ -26,22 +26,6 @@ public class UsuarioOrganizacaoService {
     private final UsuarioRepository usuarioRepository;
     private final OrganizacaoRepository organizacaoRepository;
 
-    public UsuarioOrganizacaoRespostaDTO adicionarUsuario(Long organizacaoId, AdicionarUsuarioOrganizacaoDTO dto) {
-        Organizacao org = organizacaoRepository.findById(organizacaoId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException("Organização não encontrada com o ID: " + organizacaoId));
-        Usuario usuario = usuarioRepository.findById(dto.usuarioId())
-            .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com o ID: " + dto.usuarioId()));
-        if (usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(usuario.getId(), org.getId()) != null) {
-            throw new IllegalArgumentException("Usuário já faz parte da organização.");
-        }
-        UsuarioOrganizacao uo = new UsuarioOrganizacao();
-        uo.setUsuario(usuario);
-        uo.setOrganizacao(org);
-        uo.setFuncao(dto.funcao());
-        usuarioOrganizacaoRepository.save(uo);
-        return new UsuarioOrganizacaoRespostaDTO(usuario.getId(), usuario.getNome(), usuario.getEmail(), usuario.getApelido(), dto.funcao());
-    }
-
     public List<UsuarioOrganizacaoRespostaDTO> listarUsuariosPorOrganizacao(Long organizacaoId) {
         return usuarioOrganizacaoRepository.findByOrganizacaoId(organizacaoId).stream()
             .map(uo -> new UsuarioOrganizacaoRespostaDTO(
@@ -62,13 +46,25 @@ public class UsuarioOrganizacaoService {
         return listarUsuariosPorOrganizacao(organizacaoId);
     }
 
-    public UsuarioOrganizacaoRespostaDTO adicionarUsuario(Long organizacaoId, Long usuarioId, AdicionarUsuarioOrganizacaoDTO dto) {
+    public UsuarioOrganizacaoRespostaDTO adicionarUsuario(Long organizacaoId, Long usuarioId, UsuarioOrganizacaoRequestDTO dto) {
         // Só gerente pode adicionar
         UsuarioOrganizacao gerente = usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(usuarioId, organizacaoId);
         if (gerente == null || gerente.getFuncao() != Funcao.GERENTE) {
             throw new IllegalStateException("Apenas gerente pode adicionar usuário.");
         }
-        return adicionarUsuario(organizacaoId, dto);
+        Organizacao org = organizacaoRepository.findById(organizacaoId)
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Organização não encontrada com o ID: " + organizacaoId));
+        Usuario usuario = usuarioRepository.findById(dto.usuarioId())
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com o ID: " + dto.usuarioId()));
+        if (usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(usuario.getId(), org.getId()) != null) {
+            throw new IllegalArgumentException("Usuário já faz parte da organização.");
+        }
+        UsuarioOrganizacao uo = new UsuarioOrganizacao();
+        uo.setUsuario(usuario);
+        uo.setOrganizacao(org);
+        uo.setFuncao(dto.funcao());
+        usuarioOrganizacaoRepository.save(uo);
+        return new UsuarioOrganizacaoRespostaDTO(usuario.getId(), usuario.getNome(), usuario.getEmail(), usuario.getApelido(), dto.funcao());
     }
 
     public void alterarFuncaoUsuario(Long organizacaoId, Long usuarioId, Funcao novaFuncao, Long usuarioIdLogado) {

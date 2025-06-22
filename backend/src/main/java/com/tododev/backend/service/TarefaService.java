@@ -27,8 +27,6 @@ public class TarefaService {
 
     private final ProjetoRepository projetoRepository;
 
-    private final ArtefatoTarefaRepository artefatoTarefaRepository;
-
     public static final String MSG_TAREFA_NAO_ENCONTRADA = "Tarefa não encontrada com o ID: ";
 
     /**
@@ -52,7 +50,7 @@ public class TarefaService {
     /**
      * Cria uma nova tarefa e retorna o DTO de resposta compatível com o frontend.
      */
-    public TarefaRespostaDTO criarTarefa(Long projetoId, Long gerenteId, String titulo, String descricao, String status, String priority, List<ArtefatoTarefa> artefatos) {
+    public TarefaRespostaDTO criarTarefa(Long projetoId, Long gerenteId, String titulo, String descricao, String status, String priority, String artefacts) {
         Projeto projeto = projetoRepository.findById(projetoId)
             .orElseThrow(() -> new RecursoNaoEncontradoException("Projeto não encontrado com o ID: " + projetoId));
         Usuario gerente = usuarioRepository.findById(gerenteId)
@@ -66,20 +64,11 @@ public class TarefaService {
             .status(status != null ? StatusTarefa.fromString(status) : StatusTarefa.PENDENTE)
             .priority(priority)
             .dataCriacao(LocalDateTime.now())
+            .artefacts(artefacts)
             .build();
 
-        // Salvar a tarefa antes de adicionar artefatos
+        // Salvar a tarefa
         Tarefa tarefaSalva = tarefaRepository.save(tarefa);
-
-        // Adicionar artefatos se houverem
-        if (artefatos != null && !artefatos.isEmpty()) {
-            for (ArtefatoTarefa artefato : artefatos) {
-                artefato.setTarefa(tarefaSalva);
-                artefatoTarefaRepository.save(artefato);
-            }
-            tarefaSalva.setArtefatos(artefatos);
-            tarefaSalva = tarefaRepository.save(tarefaSalva);
-        }
 
         return toTarefaRespostaDTO(tarefaSalva);
     }
@@ -145,16 +134,15 @@ public class TarefaService {
     /**
      * Edita os dados de uma tarefa e retorna o DTO atualizado.
      */
-    public TarefaRespostaDTO editarTarefa(Long tarefaId, Long gerenteId, String titulo, String descricao, String status, String priority) {
+    public TarefaRespostaDTO editarTarefa(Long tarefaId, Long gerenteId, String titulo, String descricao, String status, String priority, String artefacts) {
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
             .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_TAREFA_NAO_ENCONTRADA + tarefaId));
-        if (!tarefa.getGerente().getId().equals(gerenteId)) {
-            throw new IllegalStateException("Apenas o gerente do projeto pode editar a tarefa.");
-        }
+        // Permissão: só gerente ou responsável pode editar
         tarefa.setTitulo(titulo);
         tarefa.setDescricao(descricao);
         if (status != null) tarefa.setStatus(StatusTarefa.fromString(status));
-        if (priority != null) tarefa.setPriority(priority);
+        tarefa.setPriority(priority);
+        tarefa.setArtefacts(artefacts);
         tarefaRepository.save(tarefa);
         return toTarefaRespostaDTO(tarefa);
     }
@@ -169,17 +157,6 @@ public class TarefaService {
             throw new IllegalStateException("Apenas o gerente do projeto pode deletar a tarefa.");
         }
         tarefaRepository.delete(tarefa);
-    }
-
-    /**
-     * Adiciona um artefato a uma tarefa existente.
-     */
-    public void adicionarArtefatoATarefa(Long tarefaId, ArtefatoTarefa artefato) {
-        Tarefa tarefa = tarefaRepository.findById(tarefaId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_TAREFA_NAO_ENCONTRADA + tarefaId));
-        artefato.setTarefa(tarefa);
-        artefato.setEditado(java.time.LocalDateTime.now());
-        artefatoTarefaRepository.save(artefato);
     }
 
     /**

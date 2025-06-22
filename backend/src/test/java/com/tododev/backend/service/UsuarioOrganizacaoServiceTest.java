@@ -1,6 +1,6 @@
 package com.tododev.backend.service;
 
-import com.tododev.backend.dto.AdicionarUsuarioOrganizacaoDTO;
+import com.tododev.backend.dto.UsuarioOrganizacaoRequestDTO;
 import com.tododev.backend.dto.UsuarioOrganizacaoRespostaDTO;
 import com.tododev.backend.model.Funcao;
 import com.tododev.backend.model.Organizacao;
@@ -61,7 +61,7 @@ class UsuarioOrganizacaoServiceTest {
         org.setId(2L);
         Usuario usuario = new Usuario();
         usuario.setId(3L);
-        AdicionarUsuarioOrganizacaoDTO dto = new AdicionarUsuarioOrganizacaoDTO(3L, Funcao.DESENVOLVEDOR);
+        UsuarioOrganizacaoRequestDTO dto = new UsuarioOrganizacaoRequestDTO(3L, Funcao.DESENVOLVEDOR);
         when(organizacaoRepository.findById(2L)).thenReturn(Optional.of(org));
         when(usuarioRepository.findById(3L)).thenReturn(Optional.of(usuario));
         when(usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(3L, 2L)).thenReturn(null);
@@ -74,7 +74,7 @@ class UsuarioOrganizacaoServiceTest {
         UsuarioOrganizacao membro = new UsuarioOrganizacao();
         membro.setFuncao(Funcao.DESENVOLVEDOR);
         when(usuarioOrganizacaoRepository.findByUsuarioIdAndOrganizacaoId(1L, 2L)).thenReturn(membro);
-        AdicionarUsuarioOrganizacaoDTO dto = new AdicionarUsuarioOrganizacaoDTO(3L, Funcao.DESENVOLVEDOR);
+        UsuarioOrganizacaoRequestDTO dto = new UsuarioOrganizacaoRequestDTO(3L, Funcao.DESENVOLVEDOR);
         assertThrows(IllegalStateException.class, () -> usuarioOrganizacaoService.adicionarUsuario(2L, 1L, dto));
     }
 }

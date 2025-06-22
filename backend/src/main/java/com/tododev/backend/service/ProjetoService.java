@@ -7,8 +7,6 @@ import com.tododev.backend.repository.*;
 import jakarta.transaction.Transactional;
 
 import com.tododev.backend.dto.AtualizarProjetoDTO;
-import com.tododev.backend.dto.AdicionarMembroProjetoDTO;
-import com.tododev.backend.dto.AdicionarArtefatoProjetoDTO;
 import com.tododev.backend.dto.ProjetoResumoDTO;
 import com.tododev.backend.dto.CriarProjetoDTO;
 import com.tododev.backend.dto.ProjetoRespostaDTO;
@@ -30,7 +28,6 @@ public class ProjetoService {
     private final OrganizacaoRepository organizacaoRepository;
     private final UsuarioRepository usuarioRepository;
     private final UsuarioProjetoRepository usuarioProjetoRepository;
-    private final ArtefatoProjetoRepository artefatoProjetoRepository;
     private final UsuarioOrganizacaoRepository usuarioOrganizacaoRepository; // Adicionado repositório
 
         public static final String MSG_PROJETO_NAO_ENCONTRADO = "Projeto não encontrada com o ID: ";
@@ -59,7 +56,7 @@ public class ProjetoService {
         projeto.setDescricao(dto.descricao());
         projeto.setCor(dto.cor());
         projeto.setStatus(dto.status());
-        projeto.setArtefatos(dto.artefatos());
+        projeto.setArtefacts(dto.artefacts());
         projeto.setDataCriacao(LocalDateTime.now());
         // Conversão de datas
         if (dto.dataInicio() != null && !dto.dataInicio().isBlank()) {
@@ -145,7 +142,7 @@ public class ProjetoService {
         projeto.setDescricao(dto.descricao());
         projeto.setCor(dto.cor());
         projeto.setStatus(dto.status());
-        projeto.setArtefatos(dto.artefatos());
+        projeto.setArtefacts(dto.artefacts());
         if (dto.dataInicio() != null && !dto.dataInicio().isBlank()) {
             projeto.setDataInicio(LocalDateTime.parse(dto.dataInicio()));
         }
@@ -176,39 +173,6 @@ public class ProjetoService {
             }
         }
         return toProjetoRespostaDTO(projetoRepository.save(projeto));
-    }
-
-    public void adicionarMembrosAoProjeto(Long projetoId, Long usuarioId, List<AdicionarMembroProjetoDTO> membros) {
-        Projeto projeto = projetoRepository.findById(projetoId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
-        boolean isGerente = projeto.getUsuariosProjeto().stream()
-            .anyMatch(up -> up.getUsuario().getId().equals(usuarioId));
-        if (!isGerente) {
-            throw new IllegalStateException("Apenas gerente pode adicionar membros.");
-        }
-        for (AdicionarMembroProjetoDTO dto : membros) {
-            Usuario usuario = usuarioRepository.findById(dto.usuarioId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com o ID: " + dto.usuarioId()));
-            UsuarioProjeto usuarioProjeto = new UsuarioProjeto();
-            usuarioProjeto.setProjeto(projeto);
-            usuarioProjeto.setUsuario(usuario);
-            usuarioProjetoRepository.save(usuarioProjeto);
-        }
-    }
-
-    public void adicionarArtefatoAoProjeto(Long projetoId, Long usuarioId, AdicionarArtefatoProjetoDTO dto) {
-        Projeto projeto = projetoRepository.findById(projetoId)
-            .orElseThrow(() -> new RecursoNaoEncontradoException(MSG_PROJETO_NAO_ENCONTRADO + projetoId));
-        boolean isMembro = projeto.getUsuariosProjeto().stream().anyMatch(up -> up.getUsuario().getId().equals(usuarioId));
-        if (!isMembro) {
-            throw new IllegalStateException("Apenas membros do projeto podem adicionar artefatos.");
-        }
-        ArtefatoProjeto artefato = new ArtefatoProjeto();
-        artefato.setProjeto(projeto);
-        artefato.setConteudo(dto.conteudo());
-        artefato.setTipo(dto.tipo());
-        artefato.setEditado(java.time.LocalDateTime.now());
-        artefatoProjetoRepository.save(artefato);
     }
 
     public void deletarProjeto(Long projetoId, Long usuarioId) {

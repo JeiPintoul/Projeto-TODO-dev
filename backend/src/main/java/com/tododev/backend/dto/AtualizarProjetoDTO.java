@@ -12,7 +12,7 @@ public record AtualizarProjetoDTO(
     String status,
     String dataInicio,
     String dataVencimento,
-    String artefatos,
+    String artefacts,
     @NotNull(message = "Lista de organizações é obrigatória")
     List<CompanyData> companies,
     @NotNull(message = "Lista de gerentes é obrigatória")

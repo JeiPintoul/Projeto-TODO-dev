@@ -55,7 +55,7 @@ public record ProjetoRespostaDTO(
             projeto.getDataCriacao() != null ? projeto.getDataCriacao().toString() : null,
             projeto.getDataInicio() != null ? projeto.getDataInicio().toString() : null,
             projeto.getDataVencimento() != null ? projeto.getDataVencimento().toString() : null,
-            projeto.getArtefatos(),
+            projeto.getArtefacts(),
             companies,
             managers,
             workers,
