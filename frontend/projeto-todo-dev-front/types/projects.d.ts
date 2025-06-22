@@ -18,6 +18,6 @@ export default interface ProjectData {
   artefacts: string;
   companies: CompanyData[];
   managers: UserData[];
-  tasks: TaskData[];
+  tasks?: TaskData[];
   workers: UserData[];
 }

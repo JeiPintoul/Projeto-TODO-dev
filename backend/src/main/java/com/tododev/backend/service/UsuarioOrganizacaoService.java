@@ -32,7 +32,6 @@ public class UsuarioOrganizacaoService {
                 uo.getUsuario().getId(),
                 uo.getUsuario().getNome(),
                 uo.getUsuario().getEmail(),
-                uo.getUsuario().getApelido(),
                 uo.getFuncao()
             )).toList();
     }
@@ -64,7 +63,7 @@ public class UsuarioOrganizacaoService {
         uo.setOrganizacao(org);
         uo.setFuncao(dto.funcao());
         usuarioOrganizacaoRepository.save(uo);
-        return new UsuarioOrganizacaoRespostaDTO(usuario.getId(), usuario.getNome(), usuario.getEmail(), usuario.getApelido(), dto.funcao());
+        return new UsuarioOrganizacaoRespostaDTO(usuario.getId(), usuario.getNome(), usuario.getEmail(), dto.funcao());
     }
 
     public void alterarFuncaoUsuario(Long organizacaoId, Long usuarioId, Funcao novaFuncao, Long usuarioIdLogado) {
@@ -113,7 +112,7 @@ public class UsuarioOrganizacaoService {
         return usuarioRepository.findAll().stream()
             .filter(u -> u.getNome().toLowerCase().contains(termoLower)
                 || u.getEmail().toLowerCase().contains(termoLower)
-                || (u.getApelido() != null && u.getApelido().toLowerCase().contains(termoLower)))
+                )
             .map(u -> UsuarioRespostaDTO.fromEntity(u, false))
             .toList();
     }

@@ -14,9 +14,7 @@ public record UsuarioDTO(
     @NotBlank(message = "Senha é obrigatória")
     @Size(min = 6, message = "Senha deve ter pelo menos 6 caracteres")
     String senha,
-    String apelido,
     @NotBlank(message = "CPF é obrigatório")
-    @Pattern(regexp = "\\d{11}", message = "CPF deve conter 11 dígitos")
     String cpf,
     String telefone
 ) {}

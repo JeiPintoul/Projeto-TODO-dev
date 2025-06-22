@@ -1,2 +1,8 @@
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\test\java\com\tododev\backend\controller\ProjectControllerTest.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\test\java\com\tododev\backend\TodoApplicationTests.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/test/java/com/tododev/backend/TodoApplicationTests.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/test/java/com/tododev/backend/controller/OrganizacaoControllerTest.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/test/java/com/tododev/backend/controller/ProjectControllerTest.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/test/java/com/tododev/backend/controller/TarefaControllerTest.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/test/java/com/tododev/backend/controller/UsuarioControllerTest.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/test/java/com/tododev/backend/service/OrganizacaoServiceTest.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/test/java/com/tododev/backend/service/UsuarioOrganizacaoServiceTest.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/test/java/com/tododev/backend/service/UsuarioServiceTest.java

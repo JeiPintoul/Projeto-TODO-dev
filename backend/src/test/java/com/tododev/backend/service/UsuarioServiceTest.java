@@ -26,17 +26,15 @@ class UsuarioServiceTest {
     @Test
     void criarUsuario_sucesso() {
         when(usuarioRepository.existsByEmailIgnoreCase("email@teste.com")).thenReturn(false);
-        when(usuarioRepository.existsByApelidoIgnoreCase("apelido")).thenReturn(false);
         Usuario usuario = new Usuario();
         usuario.setId(1L);
         usuario.setNome("Nome");
         usuario.setEmail("email@teste.com");
         usuario.setSenha("senha123");
-        usuario.setApelido("apelido");
         usuario.setCpf("12345678901");
         usuario.setTelefone("11999999999");
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
-        Usuario salvo = usuarioService.criarUsuario("Nome", "email@teste.com", "senha123", "apelido", "12345678901", "11999999999");
+        Usuario salvo = usuarioService.criarUsuario("Nome", "email@teste.com", "senha123", "12345678901", "11999999999");
         assertEquals("Nome", salvo.getNome());
         assertEquals("email@teste.com", salvo.getEmail());
         assertEquals("12345678901", salvo.getCpf());
@@ -47,19 +45,18 @@ class UsuarioServiceTest {
     void criarUsuario_emailDuplicado() {
         when(usuarioRepository.existsByEmailIgnoreCase("email@teste.com")).thenReturn(true);
         assertThrows(IllegalArgumentException.class, () ->
-            usuarioService.criarUsuario("Nome", "email@teste.com", "senha123", "apelido", "12345678901", "11999999999")
+            usuarioService.criarUsuario("Nome", "email@teste.com", "senha123", "12345678901", "11999999999")
         );
     }
 
     @Test
     void criarUsuario_cpfDuplicado() {
         when(usuarioRepository.existsByEmailIgnoreCase("email2@teste.com")).thenReturn(false);
-        when(usuarioRepository.existsByApelidoIgnoreCase("apelido2")).thenReturn(false);
         Usuario usuarioExistente = new Usuario();
         usuarioExistente.setCpf("12345678901");
         when(usuarioRepository.findAll()).thenReturn(java.util.List.of(usuarioExistente));
         assertThrows(IllegalArgumentException.class, () ->
-            usuarioService.criarUsuario("Nome", "email2@teste.com", "senha123", "apelido2", "12345678901", "11999999999")
+            usuarioService.criarUsuario("Nome", "email2@teste.com", "senha123", "12345678901", "11999999999")
         );
     }
 
@@ -76,10 +73,9 @@ class UsuarioServiceTest {
         usuario.setNome("Nome");
         usuario.setEmail("email@teste.com");
         usuario.setSenha("senha123");
-        usuario.setApelido("apelido");
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
-        Usuario atualizado = usuarioService.atualizarUsuario(1L, "NovoNome", null, null, null);
+        Usuario atualizado = usuarioService.atualizarUsuario(1L, "NovoNome", null, null);
         assertEquals("NovoNome", atualizado.getNome());
     }
 
@@ -90,7 +86,6 @@ class UsuarioServiceTest {
         usuario.setNome("Nome");
         usuario.setEmail("email@teste.com");
         usuario.setSenha("senha123");
-        usuario.setApelido("apelido");
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
         doNothing().when(usuarioRepository).delete(usuario);
         assertDoesNotThrow(() -> usuarioService.deletarUsuario(1L));

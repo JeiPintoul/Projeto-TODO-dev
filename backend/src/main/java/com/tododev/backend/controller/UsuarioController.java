@@ -20,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/usuarios")
+@CrossOrigin(origins = "*")
 public class UsuarioController {
     private final UsuarioService usuarioService;
     private final ProjetoService projetoService;
@@ -31,7 +32,6 @@ public class UsuarioController {
             dto.nome(),
             dto.email(),
             dto.senha(),
-            dto.apelido(),
             dto.cpf(),
             dto.telefone()
         );
@@ -82,7 +82,7 @@ public class UsuarioController {
         if (!id.equals(usuarioId)) {
             return ResponseEntity.status(403).build();
         }
-        Usuario usuario = usuarioService.atualizarUsuario(id, dto.nome(), dto.email(), dto.senha(), dto.apelido());
+        Usuario usuario = usuarioService.atualizarUsuario(id, dto.nome(), dto.email(), dto.senha());
         return ResponseEntity.ok(UsuarioRespostaDTO.fromEntity(usuario, false));
     }
 
@@ -132,4 +132,18 @@ public class UsuarioController {
         usuarioService.getUsuarioPorId(usuarioId);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/login-simples")
+    public ResponseEntity<UsuarioRespostaDTO> loginSimples(
+    @RequestParam String email,
+    @RequestParam String senha) {
+    
+    Usuario usuario = usuarioService.buscarPorEmailESenha(email, senha);
+    
+    if (usuario == null) {
+        return ResponseEntity.status(404).build(); // Usuário não encontrado
+    }
+    
+    return ResponseEntity.ok(UsuarioRespostaDTO.fromEntity(usuario, false));
+}
 }

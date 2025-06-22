@@ -393,6 +393,7 @@ export default function ProjectsPage() {
     }
   ];
 
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);

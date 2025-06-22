@@ -34,9 +34,6 @@ public class Usuario {
     @Size(min = 6, message = "Senha deve ter pelo menos 6 caracteres")
     @Column(nullable = false)
     private String senha;
-    
-    @Column(unique = true)
-    private String apelido;
 
     @Column(unique = true, nullable = false, length = 14)
     private String cpf;

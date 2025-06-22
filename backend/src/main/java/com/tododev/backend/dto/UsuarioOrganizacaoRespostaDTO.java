@@ -6,6 +6,5 @@ public record UsuarioOrganizacaoRespostaDTO(
     Long usuarioId,
     String nome,
     String email,
-    String apelido,
     Funcao funcao
 ) {}

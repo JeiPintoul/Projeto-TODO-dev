@@ -2,14 +2,24 @@
 import "@styles/LoginRegisterForm.css";
 import { useState } from "react";
 import UserData from "@myTypes/user";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
+  
+  const router = useRouter();
+
+  const handleInternalLink = (link: string) => {
+    router.push(`/${link}`);
+  };
+
   const [formData, setFormData] = useState<UserData>({
+    id: "",
     name: "",
     cpf: "",
     phone: "",
     email: "",
     password: "",
+    isManager: false,
   });
 
   const handleChange = (
@@ -22,18 +32,40 @@ export default function RegisterForm() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent): void => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
 
-    const UserData: UserData = {
-      name: formData.name,
+    const UserData = {
+      nome: formData.name,
+      email: formData.email,
+      senha: formData.password,
       cpf: formData.cpf,
       phone: formData.phone,
-      email: formData.email,
-      password: formData.password,
     };
 
-    console.log("Putting it to API... ", JSON.stringify(UserData, null, 2));
+    try {
+      const response = await fetch('http://localhost:8080/api/usuarios', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(UserData),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log('User created sucessfully', data);
+
+      localStorage.setItem("user", JSON.stringify(data));
+
+      handleInternalLink("")
+
+    } catch (error) {
+      console.error('Error creating user', error);
+    }
   };
 
   return (

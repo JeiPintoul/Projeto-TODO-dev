@@ -13,6 +13,7 @@ import com.tododev.backend.dto.TarefaRequestDTO;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/{organizacaoId}/{projetoId}/tarefas")
+@CrossOrigin(origins = "*")
 public class TarefaController {
 
     private final TarefaService tarefaService;

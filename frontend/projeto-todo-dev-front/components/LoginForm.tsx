@@ -8,6 +8,10 @@ import LoginData from "@myTypes/login";
 export default function LoginForm() {
   const router = useRouter();
 
+  const handleInternalLink = (link: string) => {
+    router.push(`/${link}`);
+  };
+
   const handleSignUp = (e: React.MouseEvent) => {
     e.preventDefault();
     router.push("/register");
@@ -30,16 +34,41 @@ export default function LoginForm() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent): void => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
 
-    const loginData: LoginData = {
+    const loginData = {
       email: formData.email,
-      password: formData.password,
+      senha: formData.password,
     };
 
-    // TODO: Add json to API
-    console.log("Add it to API... ", JSON.stringify(loginData, null, 2));
+    try {
+
+      const response = await fetch(
+        `http://localhost:8080/api/usuarios/login-simples?email=${encodeURIComponent(loginData.email)}&senha=${encodeURIComponent(loginData.senha)}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('User logged sucessfully', data);
+
+      localStorage.setItem("user", JSON.stringify(data));
+
+      handleInternalLink("");
+
+    } catch (error) {
+      console.error('Error in login', error);
+    }
+
   };
 
   return (

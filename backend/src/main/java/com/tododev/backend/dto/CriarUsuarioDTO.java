@@ -14,8 +14,7 @@ public record CriarUsuarioDTO(
     @NotNull(message = "Senha é obrigatória")
     @jakarta.validation.constraints.Size(min = 6,
                         message = "Senha deve ter pelo menos 6 caracteres")
-    String senha,
-    String apelido
+    String senha
 ) {
 
     public static CriarUsuarioDTO criarDTO(Usuario usuario) {
@@ -25,8 +24,7 @@ public record CriarUsuarioDTO(
         return new CriarUsuarioDTO(
             usuario.getNome(),
             usuario.getEmail(),
-            usuario.getSenha(),
-            usuario.getApelido()
+            usuario.getSenha()
         );
     }
 
@@ -35,7 +33,6 @@ public record CriarUsuarioDTO(
         usuario.setNome(this.nome);
         usuario.setEmail(this.email);
         usuario.setSenha(this.senha);
-        usuario.setApelido(this.apelido);
         return usuario;
     }
 }

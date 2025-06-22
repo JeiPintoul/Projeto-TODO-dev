@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public record CriarProjetoDTO(
+    @NotBlank(message = "O user id do projeto é obrigatório")
+    String usuarioId,
     @NotBlank(message = "O nome do projeto é obrigatório")
     String nome,
     String descricao,
@@ -21,5 +23,5 @@ public record CriarProjetoDTO(
     List<UserData> workers
 ) {
     public record CompanyData(String id, String name, String description) {}
-    public record UserData(String id, String name) {}
+    public record UserData(String id, String name, String cpf, String phone, String email, String password, boolean isManager) {}
 }

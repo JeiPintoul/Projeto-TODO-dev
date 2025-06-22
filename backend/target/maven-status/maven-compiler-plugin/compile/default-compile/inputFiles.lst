@@ -1,45 +1,49 @@
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\controller\OrganizacaoController.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\controller\ProjetoController.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\controller\TarefaController.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\controller\UsuarioController.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\dto\AdicionarArtefatoProjetoDTO.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\dto\AdicionarMembroProjetoDTO.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\dto\AdicionarUsuarioOrganizacaoDTO.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\dto\ArtefatoTarefaRespostaDTO.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\dto\AtualizarProjetoDTO.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\dto\CriarProjetoDTO.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\dto\CriarUsuarioDTO.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\dto\OrganizacaoResumoDTO.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\dto\ProjetoResumoDTO.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\dto\RespostaUsuarioDTO.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\dto\TarefaRespostaDTO.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\dto\UsuarioDTO.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\dto\UsuarioOrganizacaoRespostaDTO.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\exception\RecursoNaoEncontradoException.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\exception\RespostaErro.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\exception\RestExceptionHandler.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\model\ArtefatoProjeto.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\model\ArtefatoTarefa.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\model\Funcao.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\model\Organizacao.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\model\Projeto.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\model\StatusProjeto.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\model\StatusTarefa.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\model\Tarefa.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\model\Usuario.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\model\UsuarioOrganizacao.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\model\UsuarioProjeto.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\repository\ArtefatoProjetoRepository.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\repository\ArtefatoTarefaRepository.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\repository\OrganizacaoRepository.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\repository\ProjetoRepository.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\repository\TarefaRepository.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\repository\UsuarioOrganizacaoRepository.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\repository\UsuarioProjetoRepository.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\repository\UsuarioRepository.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\service\OrganizacaoService.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\service\ProjetoService.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\service\TarefaService.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\service\UsuarioOrganizacaoService.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\service\UsuarioService.java
-C:\Users\joaop\OneDrive\Área de Trabalho\FACUL\5º Período\Engenharia de Software 1\Projeto-TODO-dev\backend\src\main\java\com\tododev\backend\TodoApplication.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/TodoApplication.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/controller/OrganizacaoController.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/controller/ProjetoController.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/controller/TarefaController.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/controller/UsuarioController.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/AdicionarArtefatoProjetoDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/AdicionarMembroProjetoDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/AdicionarUsuarioOrganizacaoDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/ArtefatoTarefaRespostaDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/AtualizarProjetoDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/CompanyRespostaDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/ConviteOrganizacaoDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/CriarProjetoDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/CriarUsuarioDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/OrganizacaoResumoDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/ProjetoRespostaDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/ProjetoResumoDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/TarefaRequestDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/TarefaRespostaDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/UsuarioDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/UsuarioOrganizacaoRequestDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/UsuarioOrganizacaoRespostaDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/dto/UsuarioRespostaDTO.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/exception/RecursoNaoEncontradoException.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/exception/RespostaErro.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/exception/RestExceptionHandler.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/model/ConviteOrganizacao.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/model/Funcao.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/model/Organizacao.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/model/Projeto.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/model/StatusProjeto.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/model/StatusTarefa.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/model/Tarefa.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/model/Usuario.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/model/UsuarioOrganizacao.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/model/UsuarioProjeto.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/repository/ConviteOrganizacaoRepository.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/repository/OrganizacaoRepository.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/repository/ProjetoRepository.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/repository/TarefaRepository.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/repository/UsuarioOrganizacaoRepository.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/repository/UsuarioProjetoRepository.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/repository/UsuarioRepository.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/service/ConviteOrganizacaoService.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/service/OrganizacaoService.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/service/ProjetoService.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/service/TarefaService.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/service/UsuarioOrganizacaoService.java
+/home/lord-amadeus/Área de trabalho/Projeto-TODO-dev/backend/src/main/java/com/tododev/backend/service/UsuarioService.java

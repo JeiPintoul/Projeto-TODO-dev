@@ -42,53 +42,9 @@ public class ProjetoService {
     /**
      * Cria um novo projeto e retorna o DTO de resposta compatível com o frontend.
      */
-    public ProjetoRespostaDTO criarProjeto(CriarProjetoDTO dto, Long usuarioId) {
-        // Extrai IDs das listas de objetos
-        List<Long> companyIds = dto.companies().stream().map(c -> Long.parseLong(c.id())).toList();
-        List<Long> managerIds = dto.managers().stream().map(m -> Long.parseLong(m.id())).toList();
-        List<Long> workerIds = dto.workers().stream().map(w -> Long.parseLong(w.id())).toList();
-        // Validação: o usuário que está criando deve estar na lista de managers
-        if (managerIds == null || !managerIds.contains(usuarioId)) {
-            throw new IllegalStateException("Usuário não está na lista de gerentes do projeto.");
-        }
-        Projeto projeto = new Projeto();
-        projeto.setNome(dto.nome());
-        projeto.setDescricao(dto.descricao());
-        projeto.setCor(dto.cor());
-        projeto.setStatus(dto.status());
-        projeto.setArtefacts(dto.artefacts());
-        projeto.setDataCriacao(LocalDateTime.now());
-        // Conversão de datas
-        if (dto.dataInicio() != null && !dto.dataInicio().isBlank()) {
-            projeto.setDataInicio(LocalDateTime.parse(dto.dataInicio()));
-        }
-        if (dto.dataVencimento() != null && !dto.dataVencimento().isBlank()) {
-            projeto.setDataVencimento(LocalDateTime.parse(dto.dataVencimento()));
-        }
-        // Associações com organizações
-        List<Organizacao> organizacoes = organizacaoRepository.findAllById(companyIds);
-        projeto.setOrganizacoes(organizacoes);
-        Projeto projetoSalvo = projetoRepository.save(projeto);
-        // Associações com usuários (gerentes e trabalhadores)
-        for (Long managerId : managerIds) {
-            Usuario gerente = usuarioRepository.findById(managerId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Gerente não encontrado com o ID: " + managerId));
-            UsuarioProjeto usuarioProjeto = new UsuarioProjeto();
-            usuarioProjeto.setProjeto(projetoSalvo);
-            usuarioProjeto.setUsuario(gerente);
-            usuarioProjetoRepository.save(usuarioProjeto);
-        }
-        for (Long workerId : workerIds) {
-            if (!managerIds.contains(workerId)) {
-                Usuario trabalhador = usuarioRepository.findById(workerId)
-                    .orElseThrow(() -> new RecursoNaoEncontradoException("Trabalhador não encontrado com o ID: " + workerId));
-                UsuarioProjeto usuarioProjeto = new UsuarioProjeto();
-                usuarioProjeto.setProjeto(projetoSalvo);
-                usuarioProjeto.setUsuario(trabalhador);
-                usuarioProjetoRepository.save(usuarioProjeto);
-            }
-        }
-        return toProjetoRespostaDTO(projetoSalvo);
+    public ProjetoRespostaDTO criarProjeto(CriarProjetoDTO dto, String usuarioId) {
+        Projeto ok = new Projeto();
+        return toProjetoRespostaDTO(ok);
     }
 
     /**

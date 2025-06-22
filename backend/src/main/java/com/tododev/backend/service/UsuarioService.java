@@ -23,12 +23,14 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioOrganizacaoRepository usuarioOrganizacaoRepository;
 
-    public Usuario criarUsuario(String nome, String email, String senha, String apelido, String cpf, String telefone) {
+    public Usuario buscarPorEmailESenha(String email, String senha) {
+        return usuarioRepository.findByEmailAndSenha(email, senha)
+            .orElse(null); // Retorna null se não encontrar
+    }
+
+    public Usuario criarUsuario(String nome, String email, String senha, String cpf, String telefone) {
         if (usuarioRepository.existsByEmailIgnoreCase(email)) {
             throw new IllegalArgumentException("Já existe um usuário com este e-mail.");
-        }
-        if (apelido != null && !apelido.isBlank() && usuarioRepository.existsByApelidoIgnoreCase(apelido)) {
-            throw new IllegalArgumentException("Já existe um usuário com este apelido.");
         }
         if (cpf != null && usuarioRepository.findAll().stream().anyMatch(u -> cpf.equals(u.getCpf()))) {
             throw new IllegalArgumentException("Já existe um usuário com este CPF.");
@@ -37,7 +39,6 @@ public class UsuarioService {
         usuario.setNome(nome);
         usuario.setEmail(email);
         usuario.setSenha(senha);
-        usuario.setApelido(apelido);
         usuario.setCpf(cpf);
         usuario.setTelefone(telefone);
         try {
@@ -61,16 +62,15 @@ public class UsuarioService {
         return usuarioRepository.findAll().stream()
             .filter(u -> u.getNome().toLowerCase().contains(termoLower)
                 || u.getEmail().toLowerCase().contains(termoLower)
-                || (u.getApelido() != null && u.getApelido().toLowerCase().contains(termoLower)))
+                )
             .toList();
     }
 
-    public Usuario atualizarUsuario(Long id, String nome, String email, String senha, String apelido) {
+    public Usuario atualizarUsuario(Long id, String nome, String email, String senha) {
         Usuario usuario = getUsuarioPorId(id);
         if (nome != null) usuario.setNome(nome);
         if (email != null) usuario.setEmail(email);
         if (senha != null) usuario.setSenha(senha);
-        if (apelido != null) usuario.setApelido(apelido);
         try {
             return usuarioRepository.save(usuario);
         } catch (DataIntegrityViolationException e) {

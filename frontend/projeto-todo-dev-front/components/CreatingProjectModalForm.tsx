@@ -56,28 +56,68 @@ export default function CreatingModalForm({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent): void => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
 
-    const projectData: ProjectData = {
-      id: "",
-      name: formData.name,
-      description: formData.description,
-      color: formData.color as ProjectColor,
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (!user?.id) {
+      console.error("Usuário não está logado");
+      return;
+    }
+
+    const projectData = {
+      usuarioId: user.id,
+      nome: formData.name,
+      descricao: formData.description,
+      cor: formData.color as ProjectColor,
       status: formData.status as ProjectStatus,
-      creationDate: new Date().toISOString().split('T')[0],
-      startDate: formData.startDate,
-      dueDate: formData.dueDate,
+      dataInicio: formData.startDate,
+      dataVencimento: formData.dueDate,
       artefacts: formData.artefacts,
       companies: allCompanies.filter(company => selectedCompanies.includes(company.id)),
       managers: allManagers.filter(manager => selectedManagers.includes(manager.id)),
-      tasks: [],
       workers: allWorkers.filter(worker => selectedWorkers.includes(worker.id))
     };
 
-    setIsOpen(false);
-    // TODO post json to API
-    console.log("Posting it to API... ", JSON.stringify(projectData, null, 2));
+    console.log(user.id);
+    console.log(projectData);
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/projetos`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(projectData)
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao criar projeto');
+      }
+  
+      const projetoCriado = await response.json();
+      console.log('Projeto criado com sucesso:', projetoCriado);
+      
+      setIsOpen(false);
+      setFormData({
+        name: "",
+        description: "",
+        color: "yellow",
+        status: "todo",
+        startDate: "",
+        dueDate: "",
+        artefacts: "",
+        companies: [],
+        managers: [],
+        tasks: [],
+        workers: []
+      });
+  
+  
+    } catch (error) {
+      console.error('Erro ao criar projeto:', error);
+    }
   };
 
   // TODO: Fetch Project workers from API
@@ -88,7 +128,7 @@ export default function CreatingModalForm({
     { id: "8", name: "Emma Davis", cpf: "654.321.987-00", phone: "+55 11 94567-1234", email: "emma.d@creative.com", password: "emmapass123", isManager: false },
     { id: "9", name: "Frank Miller", cpf: "987.123.456-00", phone: "+55 11 96789-0123", email: "frank.m@creative.com", password: "frankpass123", isManager: false },
     { id: "10", name: "Grace Taylor", cpf: "123.987.654-00", phone: "+55 11 97890-1234", email: "grace.t@digital.com", password: "gracepass123", isManager: false },
-    { id: "11", name: "Henry Brown", cpf: "456.123.789-00", phone: "+55 11 98901-2345", email: "henry.b@digital.com", password: "henrypass123", isManager: false }
+    { id: "11", name: "Michael Douglas", cpf: "456.123.789-00", phone: "+55 11 98901-2345", email: "henry.b@digital.com", password: "henrypass123", isManager: false }
   ];
 
   // TODO: Fetch Company from API
@@ -98,12 +138,12 @@ export default function CreatingModalForm({
     { id: "3", name: "Digital Commerce SA", description: "E-commerce solutions provider" }
   ];
 
-  // TODO: Fetch Managers from API
+  // TODO: POST in some page and Fetch Managers from API
   const allManagers = [
-    { id: "1", name: "Ana Silva", cpf: "345.678.901-22", phone: "+55 11 96789-0123", email: "ana.s@digital.com", password: "anasecure123", isManager: true },
-    { id: "2", name: "Carlos Oliveira", cpf: "234.567.890-11", phone: "+55 11 95678-9012", email: "carlos.o@creative.com", password: "carlos123secure", isManager: true },
-    { id: "3", name: "Maria Garcia", cpf: "456.789.123-00", phone: "+55 11 94567-8901", email: "maria.g@tech.com", password: "mariasecure123", isManager: true },
-    { id: "4", name: "John Smith", cpf: "123.456.789-00", phone: "+55 11 98765-4321", email: "john.smith@tech.com", password: "securepassword123", isManager: true }
+    { id: "100", name: "Amadeus Ferro", cpf: "345.678.901-22", phone: "+55 11 96789-0123", email: "ana.s@digital.com", password: "anasecure123", isManager: true },
+    { id: "101", name: "João Paulo Marcelino", cpf: "234.567.890-11", phone: "+55 11 95678-9012", email: "carlos.o@creative.com", password: "carlos123secure", isManager: true },
+    { id: "102", name: "Marcelo Augusto", cpf: "456.789.123-00", phone: "+55 11 94567-8901", email: "maria.g@tech.com", password: "mariasecure123", isManager: true },
+    { id: "103", name: "Vitor Aguiar", cpf: "123.456.789-00", phone: "+55 11 98765-4321", email: "john.smith@tech.com", password: "securepassword123", isManager: true }
   ];
 
   return (

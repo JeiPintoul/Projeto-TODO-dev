@@ -31,7 +31,7 @@ export default function ViewTaskModal({
 
       <div className="data">
         <h3>Start Date</h3>   
-        <p>{new Date(taskData.startData).toLocaleDateString('en-US', {
+        <p>{new Date(taskData.dueDate).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
           day: 'numeric'

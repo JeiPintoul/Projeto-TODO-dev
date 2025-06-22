@@ -12,13 +12,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/projetos")
+@CrossOrigin(origins = "*")
 public class ProjetoController {
 
     private final ProjetoService projetoService;
 
     @PostMapping
-    public ResponseEntity<ProjetoRespostaDTO> criarProjeto(@RequestParam Long usuarioId, @RequestBody @Valid CriarProjetoDTO projetoDTO) {
-        ProjetoRespostaDTO projeto = projetoService.criarProjeto(projetoDTO, usuarioId);
+    public ResponseEntity<ProjetoRespostaDTO> criarProjeto(@RequestBody @Valid CriarProjetoDTO projetoDTO) {
+        ProjetoRespostaDTO projeto = projetoService.criarProjeto(projetoDTO, projetoDTO.usuarioId());
         return ResponseEntity.ok(projeto);
     }
 
