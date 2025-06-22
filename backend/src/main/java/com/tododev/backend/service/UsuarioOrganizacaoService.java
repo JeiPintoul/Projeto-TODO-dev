@@ -2,7 +2,7 @@ package com.tododev.backend.service;
 
 import com.tododev.backend.dto.AdicionarUsuarioOrganizacaoDTO;
 import com.tododev.backend.dto.UsuarioOrganizacaoRespostaDTO;
-import com.tododev.backend.dto.RespostaUsuarioDTO;
+import com.tododev.backend.dto.UsuarioRespostaDTO;
 import com.tododev.backend.model.Funcao;
 import com.tododev.backend.model.Organizacao;
 import com.tododev.backend.model.Usuario;
@@ -106,19 +106,19 @@ public class UsuarioOrganizacaoService {
         usuarioOrganizacaoRepository.delete(uo);
     }
 
-    public List<RespostaUsuarioDTO> listarTodosUsuarios() {
+    public List<UsuarioRespostaDTO> listarTodosUsuarios() {
         return usuarioRepository.findAll().stream()
-            .map(u -> new RespostaUsuarioDTO(u.getId(), u.getNome(), u.getEmail(), u.getApelido(), List.of(), List.of()))
+            .map(u -> UsuarioRespostaDTO.fromEntity(u, false))
             .toList();
     }
 
-    public List<RespostaUsuarioDTO> buscarUsuariosPorTermo(String termo) {
+    public List<UsuarioRespostaDTO> buscarUsuariosPorTermo(String termo) {
         String termoLower = termo.toLowerCase();
         return usuarioRepository.findAll().stream()
             .filter(u -> u.getNome().toLowerCase().contains(termoLower)
                 || u.getEmail().toLowerCase().contains(termoLower)
                 || (u.getApelido() != null && u.getApelido().toLowerCase().contains(termoLower)))
-            .map(u -> new RespostaUsuarioDTO(u.getId(), u.getNome(), u.getEmail(), u.getApelido(), List.of(), List.of()))
+            .map(u -> UsuarioRespostaDTO.fromEntity(u, false))
             .toList();
     }
 

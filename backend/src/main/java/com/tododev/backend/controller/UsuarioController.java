@@ -1,6 +1,6 @@
 package com.tododev.backend.controller;
 
-import com.tododev.backend.dto.RespostaUsuarioDTO;
+import com.tododev.backend.dto.UsuarioRespostaDTO;
 import com.tododev.backend.dto.UsuarioDTO;
 import com.tododev.backend.model.Usuario;
 import com.tododev.backend.service.UsuarioService;
@@ -26,7 +26,7 @@ public class UsuarioController {
     private final TarefaService tarefaService;
 
     @PostMapping
-    public ResponseEntity<RespostaUsuarioDTO> criarUsuario(@RequestBody @Valid UsuarioDTO dto) {
+    public ResponseEntity<UsuarioRespostaDTO> criarUsuario(@RequestBody @Valid UsuarioDTO dto) {
         Usuario usuario = usuarioService.criarUsuario(
             dto.nome(),
             dto.email(),
@@ -35,22 +35,22 @@ public class UsuarioController {
             dto.cpf(),
             dto.telefone()
         );
-        return ResponseEntity.ok(RespostaUsuarioDTO.daEntidade(usuario));
+        return ResponseEntity.ok(UsuarioRespostaDTO.fromEntity(usuario, false));
     }
 
     @GetMapping
-    public ResponseEntity<List<RespostaUsuarioDTO>> listarUsuarios() {
-        List<RespostaUsuarioDTO> usuarios = usuarioService.listarUsuarios().stream()
-            .map(RespostaUsuarioDTO::daEntidade)
+    public ResponseEntity<List<UsuarioRespostaDTO>> listarUsuarios() {
+        List<UsuarioRespostaDTO> usuarios = usuarioService.listarUsuarios().stream()
+            .map(u -> UsuarioRespostaDTO.fromEntity(u, false))
             .toList();
         return ResponseEntity.ok(usuarios);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RespostaUsuarioDTO> getUsuarioPorId(@PathVariable Long id, @RequestParam Long usuarioId) {
+    public ResponseEntity<UsuarioRespostaDTO> getUsuarioPorId(@PathVariable Long id, @RequestParam Long usuarioId) {
         try {
             Usuario usuario = usuarioService.getUsuarioPorId(id);
-            return ResponseEntity.ok(RespostaUsuarioDTO.daEntidade(usuario));
+            return ResponseEntity.ok(UsuarioRespostaDTO.fromEntity(usuario, false));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -69,21 +69,21 @@ public class UsuarioController {
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<List<RespostaUsuarioDTO>> buscarUsuarios(@RequestParam String termo, @RequestParam Long usuarioId) {
-        List<RespostaUsuarioDTO> usuarios = usuarioService.buscarUsuarios(termo).stream()
-            .map(RespostaUsuarioDTO::daEntidade)
+    public ResponseEntity<List<UsuarioRespostaDTO>> buscarUsuarios(@RequestParam String termo, @RequestParam Long usuarioId) {
+        List<UsuarioRespostaDTO> usuarios = usuarioService.buscarUsuarios(termo).stream()
+            .map(u -> UsuarioRespostaDTO.fromEntity(u, false))
             .toList();
         return ResponseEntity.ok(usuarios);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RespostaUsuarioDTO> atualizarUsuario(@PathVariable Long id, @RequestParam Long usuarioId, @RequestBody @Valid UsuarioDTO dto) {
+    public ResponseEntity<UsuarioRespostaDTO> atualizarUsuario(@PathVariable Long id, @RequestParam Long usuarioId, @RequestBody @Valid UsuarioDTO dto) {
         // Regra: só o próprio usuário pode atualizar seus dados
         if (!id.equals(usuarioId)) {
             return ResponseEntity.status(403).build();
         }
         Usuario usuario = usuarioService.atualizarUsuario(id, dto.nome(), dto.email(), dto.senha(), dto.apelido());
-        return ResponseEntity.ok(RespostaUsuarioDTO.daEntidade(usuario));
+        return ResponseEntity.ok(UsuarioRespostaDTO.fromEntity(usuario, false));
     }
 
     @DeleteMapping("/{id}")

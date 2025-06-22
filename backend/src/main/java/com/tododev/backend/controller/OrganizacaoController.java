@@ -3,7 +3,7 @@ package com.tododev.backend.controller;
 import com.tododev.backend.dto.AdicionarUsuarioOrganizacaoDTO;
 import com.tododev.backend.dto.OrganizacaoResumoDTO;
 import com.tododev.backend.dto.UsuarioOrganizacaoRespostaDTO;
-import com.tododev.backend.dto.RespostaUsuarioDTO;
+import com.tododev.backend.dto.UsuarioRespostaDTO;
 import com.tododev.backend.dto.ProjetoResumoDTO;
 import com.tododev.backend.dto.ConviteOrganizacaoDTO;
 import com.tododev.backend.model.Funcao;
@@ -87,8 +87,8 @@ public class OrganizacaoController {
     }
 
     @GetMapping("/usuarios")
-    public ResponseEntity<List<RespostaUsuarioDTO>> listarUsuarios(@RequestParam(required = false) String termo) {
-        List<RespostaUsuarioDTO> usuarios;
+    public ResponseEntity<List<UsuarioRespostaDTO>> listarUsuarios(@RequestParam(required = false) String termo) {
+        List<UsuarioRespostaDTO> usuarios;
         if (termo != null && !termo.isBlank()) {
             usuarios = usuarioOrganizacaoService.buscarUsuariosPorTermo(termo);
         } else {
